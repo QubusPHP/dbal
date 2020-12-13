@@ -1,0 +1,6 @@
+.DS_Store
+/nbproject/
+/vendor/
+index.php
+.phpcs-cache
+QueryBuilder.php
