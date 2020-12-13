@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Qubus\Dbal;
 
+use Qubus\Dbal\Sql\Compiler;
+
 class Value extends Expression
 {
     /**
@@ -21,7 +23,7 @@ class Value extends Expression
      *
      * @return string Quoted identifier.
      */
-    public function handle()
+    public function handle(Compiler $compiler)
     {
         return $compiler->quote($this->value);
     }

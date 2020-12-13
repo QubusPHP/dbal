@@ -30,10 +30,10 @@ class Expression
     /**
      * Returns the expression value.
      *
-     * @param   object  $connection  connection
-     * @return  mixed   the expression value
+     * @param   object Compiler.
+     * @return  mixed  The expression value
      */
-    public function handle()
+    public function handle(...$arg)
     {
         return $this->value;
     }
