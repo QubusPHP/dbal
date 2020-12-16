@@ -24,7 +24,7 @@ use function func_get_args;
 
 /**
  * @method  Select  select()      Create select query.
- * @method  Query             query()       Returns a query object.
+ * @method  Query   query()       Returns a query object.
  * @method  Select  selectArray() Creates a select object.
  * @method  Update  update()      Creates and update object.
  * @method  Delete  delete()      Creates a delete object.
