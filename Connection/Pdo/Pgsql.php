@@ -32,7 +32,7 @@ class Pgsql extends DbalPdo
      */
     public function listTables()
     {
-        $result = DB::query('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\'', DB::SELECT)
+        $result = DB::query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'", DB::SELECT)
             ->asAssoc()
             ->execute($this);
 
@@ -48,7 +48,7 @@ class Pgsql extends DbalPdo
      */
     public function listDatabases()
     {
-        $result = DB::query('SELECT datname FROM pg_database', DB::SELECT)
+        $result = DB::query("SELECT datname FROM pg_database", DB::SELECT)
             ->asAssoc()
             ->execute($this);
 
@@ -64,7 +64,7 @@ class Pgsql extends DbalPdo
      */
     public function listFields($table)
     {
-        $query = DB::query('SELECT * FROM information_schema.columns WHERE table_name = ' . $this->quote($table), DB::SELECT)
+        $query = DB::query("SELECT * FROM information_schema.columns WHERE table_name = :table", DB::SELECT, [$this->quote($table)])
             ->asAssoc();
 
         $result = $query->execute($this);

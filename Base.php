@@ -24,7 +24,7 @@ abstract class Base
     protected $asObject;
 
     /** @var bool $propertiesLate  true for assigning properties after object creation */
-    protected $propertiesLate;
+    protected bool $propertiesLate;
 
     /** @var array  $constructorArguments constructor arguments */
     protected array $constructorArguments = [];
@@ -128,7 +128,7 @@ abstract class Base
     }
 
     /**
-     * When return type is classname u can assign properties late
+     * When return type is classname you can assign properties late
      *
      * @param bool  $propertieslate false, true to assign properties late
      * @return object  $this;
@@ -143,7 +143,7 @@ abstract class Base
     /**
      * @return bool
      */
-    public function getPropertiesLate()
+    public function getPropertiesLate(): bool
     {
         return $this->propertiesLate;
     }
@@ -165,7 +165,7 @@ abstract class Base
      *
      * @return array
      */
-    public function getConstructorArguments()
+    public function getConstructorArguments(): array
     {
         return $this->constructorArguments;
     }

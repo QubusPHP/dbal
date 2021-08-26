@@ -29,9 +29,11 @@ class Sqlite extends DbalPdo
      *
      * @param  string  $charset  encoding
      */
-    protected function setCharset($charset)
+    public function setCharset($charset)
     {
-        // skip setting the character set
+        if ($charset) {
+            $this->connection->exec('PRAGMA encoding = ' . $this->quote($charset));
+        }
     }
 
     public function listTables()

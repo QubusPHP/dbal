@@ -29,6 +29,18 @@ class Sqlsrv extends DbalPdo
      */
     protected function setCharset($charset)
     {
-        $this->connection->setAttribute(PDO::SQLSRV_ATTR_ENCODING, constant("\PDO::SQLSRV_ENCODING_" . strtoupper($charset)));
+        if ($charset === 'utf8' || $charset = 'utf-8') {
+            // use utf8 encoding
+            $this->connection->setAttribute(PDO::SQLSRV_ATTR_ENCODING, PDO::SQLSRV_ENCODING_UTF8);
+        } elseif ($charset === 'system') {
+            // use system encoding
+            $this->connection->setAttribute(PDO::SQLSRV_ATTR_ENCODING, PDO::SQLSRV_ENCODING_SYSTEM);
+        } elseif (is_numeric($charset)) {
+            // charset code passed directly
+            $this->connection->setAttribute(PDO::SQLSRV_ATTR_ENCODING, $charset);
+        } else {
+            // unknown charset, use the default encoding
+            $this->connection->setAttribute(PDO::SQLSRV_ATTR_ENCODING, PDO::SQLSRV_ENCODING_DEFAULT);
+        }
     }
 }

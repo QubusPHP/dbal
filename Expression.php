@@ -28,6 +28,18 @@ class Expression
     }
 
     /**
+     * Get the expression value as a string.
+     *
+     *     $sql = $expression->value();
+     *
+     * @return  string
+     */
+    public function value()
+    {
+        return (string) $this->value;
+    }
+
+    /**
      * Returns the expression value.
      *
      * @param   object Compiler.
@@ -36,5 +48,18 @@ class Expression
     public function handle(...$arg)
     {
         return $this->value;
+    }
+
+    /**
+     * Return the value of the expression as a string.
+     *
+     *     echo $expression;
+     *
+     * @return  string
+     * @uses    Expression::value
+     */
+    public function __toString()
+    {
+        return $this->value();
     }
 }
