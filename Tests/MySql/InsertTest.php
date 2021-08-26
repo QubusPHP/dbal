@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Dbal\MySql;
 
-
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Qubus\Dbal\DB;
 
@@ -22,7 +22,7 @@ class InsertTest extends TestCase
 {
     private $connection;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->connection = DB::connection([
             'driver'   => 'mysql',
@@ -40,7 +40,7 @@ class InsertTest extends TestCase
             ->insert('my_table')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildInsertWithValues()
@@ -55,7 +55,7 @@ class InsertTest extends TestCase
             ])
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildInsertWithFunction()
@@ -70,7 +70,7 @@ class InsertTest extends TestCase
             ])
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildInsertWithExpression()
@@ -85,6 +85,6 @@ class InsertTest extends TestCase
             ])
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 }

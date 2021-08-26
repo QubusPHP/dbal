@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Dbal\MySql;
 
-
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Qubus\Dbal\DB;
 
@@ -22,7 +22,7 @@ class SelectTest extends TestCase
 {
     private $connection;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->connection = DB::connection([
             'driver'   => 'mysql',
@@ -40,7 +40,7 @@ class SelectTest extends TestCase
             ->select()->from('my_table')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectLike()
@@ -52,7 +52,7 @@ class SelectTest extends TestCase
             ->where('field', 'like', '%this%')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectFields()
@@ -63,7 +63,7 @@ class SelectTest extends TestCase
             ->select('column', 'other')->from('my_table')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectAlias()
@@ -74,7 +74,7 @@ class SelectTest extends TestCase
             ->select(['column', 'alias'], 'other')->from('my_table')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectFnc()
@@ -85,7 +85,7 @@ class SelectTest extends TestCase
             ->select(DB::fnc('count', '*'))->from('my_table')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectFnAlias()
@@ -96,7 +96,7 @@ class SelectTest extends TestCase
             ->select(DB::fnc('count', '*')->aliasTo('num'))->from('my_table')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectFnAliasArray()
@@ -107,7 +107,7 @@ class SelectTest extends TestCase
             ->select([DB::fnc('count', '*'), 'alias'])->from('my_table')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectExpr()
@@ -118,7 +118,7 @@ class SelectTest extends TestCase
             ->select(DB::expr('expr'))->from('my_table')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectField()
@@ -129,7 +129,7 @@ class SelectTest extends TestCase
             ->select('column')->from('my_table')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectMultipleTables()
@@ -140,7 +140,7 @@ class SelectTest extends TestCase
             ->select()->from('my_table', 'other_table')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectWhere()
@@ -152,7 +152,7 @@ class SelectTest extends TestCase
             ->where('field', 'value')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectHaving()
@@ -164,7 +164,7 @@ class SelectTest extends TestCase
             ->having('field', 'value')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectWhereNot()
@@ -177,7 +177,7 @@ class SelectTest extends TestCase
             ->andNotWhere('other_field', 'other value')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectHavingNot()
@@ -190,7 +190,7 @@ class SelectTest extends TestCase
             ->andNotHaving('other_field', 'other value')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectWhereNotNested()
@@ -206,7 +206,7 @@ class SelectTest extends TestCase
             })
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectHavingNotNested()
@@ -222,7 +222,7 @@ class SelectTest extends TestCase
             })
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectWhereNull()
@@ -234,7 +234,7 @@ class SelectTest extends TestCase
             ->where('field', null)
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectHavingNull()
@@ -246,7 +246,7 @@ class SelectTest extends TestCase
             ->having('field', null)
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectWhereNotNull()
@@ -258,7 +258,7 @@ class SelectTest extends TestCase
             ->where('field', '!=', null)
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectHavingNotNull()
@@ -270,7 +270,7 @@ class SelectTest extends TestCase
             ->having('field', '!=', null)
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectHavingOr()
@@ -283,7 +283,7 @@ class SelectTest extends TestCase
             ->orHaving('other', '!=', 'other value')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectWhereOr()
@@ -296,7 +296,7 @@ class SelectTest extends TestCase
             ->orWhere('other', '!=', 'other value')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectHavingAnd()
@@ -309,7 +309,7 @@ class SelectTest extends TestCase
             ->andHaving('other', '!=', 'other value')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectWhereAnd()
@@ -322,7 +322,7 @@ class SelectTest extends TestCase
             ->andWhere('other', '!=', 'other value')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectWhereAndGroups()
@@ -340,7 +340,7 @@ class SelectTest extends TestCase
             })
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectHavingAndGroups()
@@ -358,7 +358,7 @@ class SelectTest extends TestCase
             })
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectWhereAndGroup()
@@ -372,7 +372,7 @@ class SelectTest extends TestCase
             ->orWhere('field', '=', 'something')->andWhereClose()
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectHavingAndGroup()
@@ -386,7 +386,7 @@ class SelectTest extends TestCase
             ->orHaving('field', '=', 'something')->andHavingClose()
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectWhereIn()
@@ -398,7 +398,7 @@ class SelectTest extends TestCase
             ->where('field', [1, 2, 3])
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectHavingIn()
@@ -410,7 +410,7 @@ class SelectTest extends TestCase
             ->having('field', [1, 2, 3])
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectWhereNotIn()
@@ -422,7 +422,7 @@ class SelectTest extends TestCase
             ->where('field', 'not in', [1, 2, 3])
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectHavingNotIn()
@@ -434,7 +434,7 @@ class SelectTest extends TestCase
             ->having('field', 'not in', [1, 2, 3])
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectWhereFn()
@@ -447,7 +447,7 @@ class SelectTest extends TestCase
             ->where('CHAR_LENGTH("field")', '<', 20)
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectJoin()
@@ -460,7 +460,7 @@ class SelectTest extends TestCase
             ->on('my_table.field', '=', 'other_table.field')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectJoinAnd()
@@ -474,7 +474,7 @@ class SelectTest extends TestCase
             ->andOn('my_table.other_field', 'other_table.other_field')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectJoinOr()
@@ -488,7 +488,7 @@ class SelectTest extends TestCase
             ->orOn('my_table.other_field', 'other_table.other_field')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildSelectBindings()
@@ -500,6 +500,6 @@ class SelectTest extends TestCase
             ->bind('table', 'my_table')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 }

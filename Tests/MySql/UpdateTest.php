@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Dbal\MySql;
 
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Qubus\Dbal\DB;
 
@@ -21,7 +22,7 @@ class UpdateTest extends TestCase
 {
     private $connection;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->connection = DB::connection([
             'driver'   => 'mysql',
@@ -42,7 +43,7 @@ class UpdateTest extends TestCase
             ])
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildMultiple()
@@ -57,7 +58,7 @@ class UpdateTest extends TestCase
             ])
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildWhere()
@@ -72,6 +73,6 @@ class UpdateTest extends TestCase
             ->where('field', 'other value')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 }

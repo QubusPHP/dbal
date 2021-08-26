@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Dbal\MySql;
 
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Qubus\Dbal\DB;
 
@@ -21,7 +22,7 @@ class DeleteTest extends TestCase
 {
     private $connection;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->connection = DB::connection([
             'driver'   => 'mysql',
@@ -39,7 +40,7 @@ class DeleteTest extends TestCase
             ->delete()->from('my_table')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildDeleteWhere()
@@ -51,7 +52,7 @@ class DeleteTest extends TestCase
             ->where('field', 'value')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildDeleteWhereNull()
@@ -63,7 +64,7 @@ class DeleteTest extends TestCase
             ->where('field', null)
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildDeleteWhereNotNull()
@@ -75,7 +76,7 @@ class DeleteTest extends TestCase
             ->where('field', '!=', null)
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildDeleteWhereOr()
@@ -88,7 +89,7 @@ class DeleteTest extends TestCase
             ->orWhere('other', '!=', 'other value')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildDeleteWhereAnd()
@@ -101,7 +102,7 @@ class DeleteTest extends TestCase
             ->andWhere('other', '!=', 'other value')
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildDeleteWhereAndGroup()
@@ -117,7 +118,7 @@ class DeleteTest extends TestCase
             ->andWhereClose()
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildDeleteWhereIn()
@@ -129,7 +130,7 @@ class DeleteTest extends TestCase
             ->where('field', [1, 2, 3])
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildDeleteWhereNotIn()
@@ -141,7 +142,7 @@ class DeleteTest extends TestCase
             ->where('field', 'not in', [1, 2, 3])
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 
     public function testBuildDeleteWhereFnc()
@@ -154,6 +155,6 @@ class DeleteTest extends TestCase
             ->where('CHAR_LENGTH("field")', '<', 20)
             ->compile();
 
-        $this->assertEquals($expected, $query);
+        Assert::assertEquals($expected, $query);
     }
 }
