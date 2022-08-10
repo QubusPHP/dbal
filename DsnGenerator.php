@@ -19,9 +19,10 @@ class DsnGenerator
     /**
      * Generates Sql Server DSN.
      *
+     * @param Connection $conn
      * @return string
      */
-    public function getSqlsrvDNS(Connection $conn)
+    public function getSqlsrvDNS(Connection $conn): string
     {
         $dsn = 'sqlsrv:server=';
         if (isset($conn->getConfigurations()['host'])) {
@@ -42,9 +43,10 @@ class DsnGenerator
     /**
      * Generates Dblib DSN.
      *
+     * @param Connection $conn
      * @return string
      */
-    public function getDblibDNS(Connection $conn)
+    public function getDblibDNS(Connection $conn): string
     {
         $dsn = 'dblib:host=';
         if (isset($conn->getConfigurations()['host'])) {
@@ -62,9 +64,10 @@ class DsnGenerator
     /**
      * Generates Sqlite DSN.
      *
+     * @param Connection $conn
      * @return string
      */
-    public function getSqliteDNS(Connection $conn)
+    public function getSqliteDNS(Connection $conn): string
     {
         $dsn = 'sqlite:';
         if (isset($conn->getConfigurations()['path'])) {
@@ -78,9 +81,10 @@ class DsnGenerator
     /**
      * Generates Postgres DSN.
      *
+     * @param Connection $conn
      * @return string
      */
-    public function getPgsqlDNS(Connection $conn)
+    public function getPgsqlDNS(Connection $conn): string
     {
         $dsn = 'pgsql:';
         if (isset($conn->getConfigurations()['host']) && ! empty($conn->getConfigurations()['host'])) {
@@ -106,9 +110,10 @@ class DsnGenerator
     /**
      * Generates Oracle DSN.
      *
+     * @param Connection $conn
      * @return string
      */
-    public function getOracleDNS(Connection $conn)
+    public function getOracleDNS(Connection $conn): string
     {
         $dsn = 'pgsql:';
         if (isset($conn->getConfigurations()['dbname'])) {
@@ -119,9 +124,10 @@ class DsnGenerator
     /**
      * Generates IBM DSN.
      *
+     * @param Connection $conn
      * @return string
      */
-    public function getIbmDNS(Connection $conn)
+    public function getIbmDNS(Connection $conn): string
     {
         $dsn = 'ibm:DRIVER={IBM DB2 ODBC DRIVER};';
         if (isset($conn->getConfigurations()['host'])) {
@@ -140,9 +146,10 @@ class DsnGenerator
     /**
      * Generates Mysql DSN.
      *
+     * @param Connection $conn
      * @return string
      */
-    public function getMysqlDNS(Connection $conn)
+    public function getMysqlDNS(Connection $conn): string
     {
         $dsn = 'mysql:';
         if (isset($conn->getConfigurations()['host']) && ! empty($conn->getConfigurations()['host'])) {

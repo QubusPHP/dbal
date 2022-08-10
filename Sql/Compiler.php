@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Qubus\Dbal\Sql;
 
 use Qubus\Dbal\Base;
+use Qubus\Dbal\Connection;
 use Qubus\Dbal\Query;
 
 use function array_merge;
@@ -26,16 +27,16 @@ use function trim;
 
 abstract class Compiler
 {
-    /** @var object $connection Dbal connection object. */
-    protected $connection;
+    /** @var Connection $connection Dbal connection object. */
+    protected Connection $connection;
 
     /** @var  array  $query  query commands */
     protected array $query = [];
 
     /**
-     * @param object $connection Dbal connection object.
+     * @param Connection $connection Dbal connection object.
      */
-    public function __construct(&$connection)
+    public function __construct(Connection &$connection)
     {
         $this->connection = $connection;
     }
@@ -43,13 +44,13 @@ abstract class Compiler
     /**
      * Compiles the query.
      *
-     * @param object $query Query object.
+     * @param mixed $query Query object.
      */
-    public function compile($query, ?string $type = null, array $bindings = [])
+    public function compile(mixed $query, ?string $type = null, array $bindings = []): string
     {
         // ensure an instance of Base
         if (! $query instanceof Base) {
-            $query = new Query($query, $type, $bindings);
+            $query = new Query(query: $query, type: $type, bindings: $bindings);
         }
 
         // get the query contents
@@ -60,7 +61,7 @@ abstract class Compiler
         $bindings = array_merge($queryBindings, $bindings);
 
         // process the bindings
-        $contents = $this->processBindings($contents, $bindings);
+        $contents = $this->processBindings(contents: $contents, bindings: $bindings);
 
         // returns when it is a raw string
         if (is_string($contents)) {
@@ -87,23 +88,23 @@ abstract class Compiler
     /**
      * Processes all the query bindings recursively.
      *
-     * @param mixes $contents Query contents.
+     * @param mixed $contents Query contents.
      * @param array $bindings An array of query bindings.
      */
-    protected function processBindings($contents, array $bindings, bool $first = true)
+    protected function processBindings(mixed $contents, array $bindings, bool $first = true): mixed
     {
         if ($first && empty($bindings)) {
             return $contents;
         }
 
-        if (is_array($contents)) {
+        if (is_array(value: $contents)) {
             foreach ($contents as $i => &$v) {
-                $contents[$i] = $this->processBindings($v, $bindings, false);
+                $contents[$i] = $this->processBindings(contents: $v, bindings: $bindings, first: false);
             }
-        } elseif (is_string($contents)) {
+        } elseif (is_string(value: $contents)) {
             foreach ($bindings as $from => $to) {
-                substr($from, 0, 1) !== ':' && $from = ':' . $from;
-                $contents = preg_replace('/' . $from . '/', $to, $contents);
+                substr(string: $from, offset: 0, length: 1) !== ':' && $from = ':' . $from;
+                $contents = preg_replace(pattern: '/' . $from . '/', replacement: $to, subject: $contents);
             }
         }
 
@@ -111,24 +112,24 @@ abstract class Compiler
     }
 
     /**
-     * Value quoting shotcut.
+     * Value quoting shortcut.
      *
-     * @param  mixed $value  Value to quote.
-     * @return string Quoted value.
+     * @param mixed $value Value to quote.
+     * @return int|string Quoted value.
      */
-    protected function quote($value)
+    protected function quote(mixed $value): int|string
     {
-        return $this->connection->quote($value);
+        return $this->connection->quote(value: $value);
     }
 
     /**
-     * Identifier quoting shotcut.
+     * Identifier quoting shortcut.
      *
      * @param   mixed   $identifier  identifier to quote
      * @return  string  quoted value
      */
-    protected function quoteIdentifier($identifier)
+    protected function quoteIdentifier(mixed $identifier): string
     {
-        return $this->connection->quoteIdentifier($identifier);
+        return $this->connection->quoteIdentifier(value: $identifier);
     }
 }

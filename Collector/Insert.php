@@ -27,10 +27,10 @@ use function reset;
 class Insert extends Collector
 {
     /** @var  string  $type  query type */
-    protected $type = DB::INSERT;
+    protected string $type = DB::INSERT;
 
     /** @var  string  $insertIdField  field used for lastInsertId */
-    public $insertIdField;
+    public string $insertIdField;
 
     /** @var  array  $columns  columns to use */
     public array $columns = [];
@@ -40,17 +40,17 @@ class Insert extends Collector
 
     public function __construct($table, $values = [])
     {
-        $this->into($table);
-        $this->values($values);
+        $this->into(table: $table);
+        $this->values(values: $values);
     }
 
     /**
      * Sets/Gets the field used for lastInsertId
      *
-     * @param   string
-     * @return  mixed  current instance when setting, string fieldname when gettting.
+     * @param string|null $field
+     * @return  string|static  current instance when setting, string fieldname when getting.
      */
-    public function insertIdField($field = null)
+    public function insertIdField(string $field = null): static|string
     {
         if ($field) {
             $this->insertIdField = $field;
@@ -64,10 +64,9 @@ class Insert extends Collector
     /**
      * Sets the table to insert into.
      *
-     * @param   string  $table  table to insert into
-     * @return  object  $this
+     * @param string $table  table to insert into
      */
-    public function into($table)
+    public function into(string $table): static
     {
         $this->table = $table;
         return $this;
@@ -76,20 +75,19 @@ class Insert extends Collector
     /**
      * Adds values to insert
      *
-     * @param   array   $values  array or collection of arrays to insert
-     * @param   bool    $merge   wether to merge the values with the last inserted set
-     * @return  object  $this
+     * @param array $values  array or collection of arrays to insert
+     * @param bool $merge   whether to merge the values with the last inserted set
      */
-    public function values($values = [], $merge = false)
+    public function values(array $values = [], bool $merge = false): static
     {
         if (empty($values)) {
             return $this;
         }
 
-        is_array(reset($values)) || $values = [$values];
+        is_array(value: reset($values)) || $values = [$values];
 
         foreach ($values as $v) {
-            $keys = array_keys($v);
+            $keys = array_keys(array: $v);
             $this->columns = array_merge($this->columns, $keys);
 
             if ($merge && count($this->values)) {

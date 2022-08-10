@@ -21,9 +21,9 @@ class Identifier extends Expression
     /**
      * Handles identifier quoting.
      *
-     * @return  string quoted identifier
+     * @return Compiler $compiler quoted identifier
      */
-    public function handle(Compiler $compiler)
+    public function handle($compiler): mixed
     {
         return $compiler->quoteIdentifier($this->value);
     }

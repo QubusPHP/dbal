@@ -17,95 +17,98 @@ namespace Qubus\Dbal\Connection\Pdo;
 use Qubus\Dbal\Connection\DbalPdo;
 use Qubus\Dbal\DB;
 
+use Qubus\Exception\Exception;
+
 use function array_map;
 use function reset;
 
 class Pgsql extends DbalPdo
 {
     /** @var string $tableQuote  table quote */
-    protected static $tableQuote = '"';
+    protected static string $tableQuote = '"';
 
     /**
      * Get an array of table names from the connection.
      *
-     * @return  array  tables names
+     * @return  array  tables names.
+     * @throws Exception
      */
-    public function listTables()
+    public function listTables(): array
     {
-        $result = DB::query('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\'', DB::SELECT)
+        $result = DB::query(query: "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'", type: DB::SELECT)
             ->asAssoc()
-            ->execute($this);
+            ->execute(connection: $this);
 
-        return array_map(function ($r) {
+        return array_map(callback: function ($r) {
             return reset($r);
-        }, $result);
+        }, array: $result);
     }
 
     /**
      * Get an array of database names from the connection.
      *
-     * @return  array  database names
+     * @return  array  database names.
+     * @throws Exception
      */
-    public function listDatabases()
+    public function listDatabases(): array
     {
-        $result = DB::query('SELECT datname FROM pg_database', DB::SELECT)
+        $result = DB::query(query: "SELECT datname FROM pg_database", type: DB::SELECT)
             ->asAssoc()
-            ->execute($this);
+            ->execute(connection: $this);
 
-        return array_map(function ($r) {
+        return array_map(callback: function ($r) {
             return reset($r);
-        }, $result);
+        }, array: $result);
     }
 
     /**
      * Get an array of table fields from a table.
      *
      * @return  array  field arrays
+     * @throws Exception
      */
-    public function listFields($table)
+    public function listFields($table): array
     {
-        $query = DB::query('SELECT * FROM information_schema.columns WHERE table_name = ' . $this->quote($table), DB::SELECT)
+        $query = DB::query(
+            query: "SELECT * FROM information_schema.columns WHERE table_name = :table",
+            type: DB::SELECT,
+            bindings: [$this->quote(value: $table)]
+        )
             ->asAssoc();
 
-        $result = $query->execute($this);
+        $result = $query->execute(connection: $this);
 
-        return array_map(function ($r) {
+        return array_map(callback: function ($r) {
             return reset($r);
-        }, $result);
+        }, array: $result);
     }
 
     /**
      * Start a transaction.
-     *
-     * @return  object  $this;
      */
-    public function startTransaction()
+    public function startTransaction(): static
     {
-        $this->pdoInstance->query('BEGIN');
+        $this->pdoInstance->query(statement: 'BEGIN');
 
         return $this;
     }
 
     /**
      * Commit a transaction.
-     *
-     * @return  object  $this;
      */
-    public function commitTransaction()
+    public function commitTransaction(): static
     {
-        $this->pdoInstance->query('COMMIT');
+        $this->pdoInstance->query(statement: 'COMMIT');
 
         return $this;
     }
 
     /**
      * Roll back a transaction.
-     *
-     * @return  object  $this;
      */
-    public function rollbackTransaction()
+    public function rollbackTransaction(): static
     {
-        $this->pdoInstance->query('ROLLBACK');
+        $this->pdoInstance->query(statement: 'ROLLBACK');
 
         return $this;
     }

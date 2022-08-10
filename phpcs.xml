@@ -39,7 +39,7 @@
         <exclude name="SlevomatCodingStandard.Files.TypeNameMatchesFileName.NoMatchBetweenTypeNameAndFileName"/>
     </rule>
 
-     <!-- A cast statement MUST NOT be preceeded by a single space. -->
+    <!-- A cast statement MUST NOT be preceeded by a single space. -->
     <rule ref="Generic.Formatting.SpaceBeforeCast">
         <exclude name="Generic.Formatting.SpaceBeforeCast.NoSpace"/>
     </rule>
@@ -120,6 +120,11 @@
     <!-- The Yoda comparison CAN be used. -->
     <rule ref="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison">
         <exclude name="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison.DisallowedYodaComparison"/>
+    </rule>
+
+    <!-- @author and @copyright Annotations can be used. -->
+    <rule ref="SlevomatCodingStandard.Commenting.ForbiddenAnnotations">
+        <exclude name="SlevomatCodingStandard.Commenting.ForbiddenAnnotations"/>
     </rule>
 
     <!-- File names should be lowercased and class names should be uppercase. -->

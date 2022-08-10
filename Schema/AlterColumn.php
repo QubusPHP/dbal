@@ -32,8 +32,8 @@ namespace Qubus\Dbal\Schema;
 
 class AlterColumn extends BaseColumn
 {
-    /** @var string $table */
-    protected $table;
+    /** @var string|AlterTable $table */
+    protected string|AlterTable $table;
 
     public function __construct(AlterTable $table, string $name, ?string $type = null)
     {
@@ -51,8 +51,8 @@ class AlterColumn extends BaseColumn
      */
     public function defaultValue($value): BaseColumn
     {
-        if ($this->get('handleDefault', true)) {
-            return parent::defaultValue($value);
+        if ($this->get(name: 'handleDefault', default: true)) {
+            return parent::defaultValue(value: $value);
         }
 
         return $this;
@@ -63,6 +63,6 @@ class AlterColumn extends BaseColumn
      */
     public function autoincrement(): self
     {
-        return $this->set('autoincrement', true);
+        return $this->set(name: 'autoincrement', value: true);
     }
 }

@@ -18,7 +18,7 @@ use Qubus\Dbal\DB;
 
 class Delete extends Where
 {
-    protected $type = DB::DELETE;
+    protected string $type = DB::DELETE;
 
     public function __construct($table = null)
     {

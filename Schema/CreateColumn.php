@@ -32,16 +32,16 @@ namespace Qubus\Dbal\Schema;
 
 class CreateColumn extends BaseColumn
 {
-    /** @var string $table */
+    /** @var CreateTable $table */
     protected CreateTable $table;
 
     public function __construct(CreateTable $table, string $name, string $type)
     {
         $this->table = $table;
-        parent::__construct($name, $type);
+        parent::__construct(name: $name, type: $type);
     }
 
-    public function getTable(): string
+    public function getTable(): CreateTable
     {
         return $this->table;
     }
@@ -51,7 +51,7 @@ class CreateColumn extends BaseColumn
      */
     public function autoincrement(?string $name = null): self
     {
-        $this->table->autoincrement($this, $name);
+        $this->table->autoincrement(column: $this, name: $name);
         return $this;
     }
 
@@ -60,7 +60,7 @@ class CreateColumn extends BaseColumn
      */
     public function primary(?string $name = null): self
     {
-        $this->table->primary($this->name, $name);
+        $this->table->primary(columns: $this->name, name: $name);
         return $this;
     }
 
@@ -69,7 +69,7 @@ class CreateColumn extends BaseColumn
      */
     public function unique(?string $name = null): self
     {
-        $this->table->unique($this->name, $name);
+        $this->table->unique(columns: $this->name, name: $name);
         return $this;
     }
 
@@ -78,7 +78,7 @@ class CreateColumn extends BaseColumn
      */
     public function index(?string $name = null): self
     {
-        $this->table->index($this->name, $name);
+        $this->table->index(columns: $this->name, name: $name);
         return $this;
     }
 }

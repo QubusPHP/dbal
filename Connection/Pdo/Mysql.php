@@ -17,6 +17,8 @@ namespace Qubus\Dbal\Connection\Pdo;
 use Qubus\Dbal\Connection\DbalPdo;
 use Qubus\Dbal\DB;
 
+use Qubus\Exception\Exception;
+
 use function array_map;
 use function explode;
 use function reset;
@@ -29,57 +31,60 @@ class Mysql extends DbalPdo
      * Get an array of table names from the connection.
      *
      * @return array tables names
+     * @throws Exception
      */
-    public function listTables()
+    public function listTables(): array
     {
-        $query = DB::query('SHOW TABLES', DB::SELECT)->asAssoc();
+        $query = DB::query(query: 'SHOW TABLES', type: DB::SELECT)->asAssoc();
 
-        $result = $query->execute($this);
+        $result = $query->execute(connection: $this);
 
-        return array_map(function ($r) {
+        return array_map(callback: function ($r) {
             return reset($r);
-        }, $result);
+        }, array: $result);
     }
 
     /**
      * Get an array of database names from the connection.
      *
      * @return  array  database names
+     * @throws Exception
      */
-    public function listDatabases()
+    public function listDatabases(): array
     {
-        $query = DB::query('SHOW DATABASES', DB::SELECT)->asAssoc();
+        $query = DB::query(query: 'SHOW DATABASES', type: DB::SELECT)->asAssoc();
 
-        $result = $query->execute($this);
+        $result = $query->execute(connection: $this);
 
-        return array_map(function ($r) {
+        return array_map(callback: function ($r) {
             return reset($r);
-        }, $result);
+        }, array: $result);
     }
 
     /**
      * Get an array of table fields from a table.
      *
-     * @return  array  field arrays
+     * @return array field arrays
+     * @throws Exception
      */
-    public function listFields($table)
+    public function listFields($table): array
     {
-        $query = DB::query('SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier($table), DB::SELECT)->asAssoc();
+        $query = DB::query(query: 'SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier(value: $table), type: DB::SELECT)->asAssoc();
 
-        $result = $query->execute($this);
+        $result = $query->execute(connection: $this);
 
         $return = [];
 
         foreach ($result as $r) {
             $type = $r['Type'];
 
-            if (strpos($type, ' ')) {
-                [$type, $extra] = explode(' ', $type, 2);
+            if (strpos(haystack: $type, needle: ' ')) {
+                [$type, $extra] = explode(separator: ' ', string: $type, limit: 2);
             }
 
-            if ($pos = strpos($type, '(')) {
-                $field['type'] = substr($type, 0, $pos);
-                $field['constraint'] = substr($type, $pos + 1, -1);
+            if ($pos = strpos(haystack: $type, needle: '(')) {
+                $field['type'] = substr(string: $type, offset: 0, length: $pos);
+                $field['constraint'] = substr(string: $type, offset: $pos + 1, length: -1);
             } else {
                 $field['constraint'] = null;
             }
@@ -89,7 +94,7 @@ class Mysql extends DbalPdo
             $field['name'] = $r['Field'];
             $field['default'] = $r['Default'];
             $field['null'] = $r['Null'] !== 'No';
-            $field['privileges'] = explode(',', $r['Privileges']);
+            $field['privileges'] = explode(separator: ',', string: $r['Privileges']);
             $field['key'] = $r['Key'];
             $field['comments'] = $r['Comment'];
             $field['collation'] = $r['Collation'];
@@ -108,29 +113,27 @@ class Mysql extends DbalPdo
 
     /**
      * Start a transaction.
-     *
-     * @return object $this;
      */
-    public function startTransaction()
+    public function startTransaction(): static
     {
-        $this->pdoInstance->query('SET AUTOCOMMIT=0');
-        $this->pdoInstance->query('START TRANSACTION');
+        $this->pdoInstance->query(statement: 'SET AUTOCOMMIT=0');
+        $this->pdoInstance->query(statement: 'START TRANSACTION');
 
         return $this;
     }
 
-    public function commitTransaction()
+    public function commitTransaction(): static
     {
-        $this->pdoInstance->query('COMMIT');
-        $this->pdoInstance->query('SET AUTOCOMMIT=1');
+        $this->pdoInstance->query(statement: 'COMMIT');
+        $this->pdoInstance->query(statement: 'SET AUTOCOMMIT=1');
 
         return $this;
     }
 
-    public function rollbackTransaction()
+    public function rollbackTransaction(): static
     {
-        $this->pdoInstance->query('ROLLBACK');
-        $this->pdoInstance->query('SET AUTOCOMMIT=1');
+        $this->pdoInstance->query(statement: 'ROLLBACK');
+        $this->pdoInstance->query(statement: 'SET AUTOCOMMIT=1');
 
         return $this;
     }

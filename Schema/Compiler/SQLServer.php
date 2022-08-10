@@ -40,28 +40,20 @@ class SQLServer extends Compiler
     protected string $wrapper = '[%s]';
 
     /** @var string[] $modifiers */
-    protected $modifiers = ['nullable', 'default', 'autoincrement'];
+    protected array $modifiers = ['nullable', 'default', 'autoincrement'];
 
     /** @var string $autoincrement */
-    protected $autoincrement = 'IDENTITY';
+    protected string $autoincrement = 'IDENTITY';
 
-    /**
-     * @inheritDoc
-     */
     protected function handleTypeInteger(BaseColumn $column): string
     {
-        switch ($column->get('size', 'normal')) {
-            case 'tiny':
-                return 'TINYINT';
-            case 'small':
-                return 'SMALLINT';
-            case 'medium':
-                return 'INTEGER';
-            case 'big':
-                return 'BIGINT';
-        }
-
-        return 'INTEGER';
+        return match($column->get(name: 'size', default: 'normal')) {
+            'tiny' => 'TINYINT',
+            'small' => 'SMALLINT',
+            'medium' => 'INTEGER',
+            'big' => 'BIGINT',
+            default => 'INTEGER',
+        };
     }
 
     /**
@@ -69,8 +61,8 @@ class SQLServer extends Compiler
      */
     protected function handleTypeDecimal(BaseColumn $column): string
     {
-        if (null !== $l = $column->get('length')) {
-            if (null === $p = $column->get('precision')) {
+        if (null !== $l = $column->get(name: 'length')) {
+            if (null === $p = $column->get(name: 'precision')) {
                 return 'DECIMAL (' . $this->value($l) . ')';
             }
             return 'DECIMAL (' . $this->value($l) . ', ' . $this->value($p) . ')';
@@ -172,11 +164,11 @@ class SQLServer extends Compiler
      */
     public function getColumns(string $database, string $table): array
     {
-        $sql = 'SELECT ' . $this->wrap('column_name') . ' AS ' . $this->wrap('name')
-        . ', ' . $this->wrap('data_type') . ' AS ' . $this->wrap('type')
-        . ' FROM ' . $this->wrap('information_schema') . '.' . $this->wrap('columns')
-        . ' WHERE ' . $this->wrap('table_schema') . ' = ? AND ' . $this->wrap('table_name') . ' = ? '
-        . ' ORDER BY ' . $this->wrap('ordinal_position') . ' ASC';
+        $sql = 'SELECT ' . $this->wrap(name: 'column_name') . ' AS ' . $this->wrap(name: 'name')
+        . ', ' . $this->wrap(name: 'data_type') . ' AS ' . $this->wrap(name: 'type')
+        . ' FROM ' . $this->wrap(name: 'information_schema') . '.' . $this->wrap(name: 'columns')
+        . ' WHERE ' . $this->wrap(name: 'table_schema') . ' = ? AND ' . $this->wrap(name: 'table_name') . ' = ? '
+        . ' ORDER BY ' . $this->wrap(name: 'ordinal_position') . ' ASC';
 
         return [
             'sql'    => $sql,

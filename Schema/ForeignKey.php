@@ -38,13 +38,13 @@ class ForeignKey
     protected string $refTable;
 
     /** @var string[] $refColumns */
-    protected $refColumns;
+    protected array $refColumns;
 
     /** @var array $actions */
     protected array $actions = [];
 
     /** @var string[] $columns */
-    protected $columns;
+    protected array $columns;
 
     /**
      * @param string[] $columns
@@ -59,9 +59,9 @@ class ForeignKey
      */
     protected function addAction(string $on, string $action): self
     {
-        $action = strtoupper($action);
+        $action = strtoupper(string: $action);
 
-        if (! in_array($action, ['RESTRICT', 'CASCADE', 'NO ACTION', 'SET NULL'])) {
+        if (! in_array(needle: $action, haystack: ['RESTRICT', 'CASCADE', 'NO ACTION', 'SET NULL'])) {
             return $this;
         }
 
@@ -114,7 +114,7 @@ class ForeignKey
      */
     public function onDelete(string $action): self
     {
-        return $this->addAction('ON DELETE', $action);
+        return $this->addAction(on:'ON DELETE', action: $action);
     }
 
     /**
@@ -122,6 +122,6 @@ class ForeignKey
      */
     public function onUpdate(string $action): self
     {
-        return $this->addAction('ON UPDATE', $action);
+        return $this->addAction(on:'ON UPDATE', action: $action);
     }
 }

@@ -21,21 +21,21 @@ use function func_num_args;
 class Join
 {
     /** @var  string  $table  table to join */
-    protected $table;
+    protected string $table;
 
-    /** @var  string  $type  join type */
-    protected $type;
+    /** @var  ?string $type  join type */
+    protected ?string $type;
 
     /** @var  array  $on  array of on statements */
-    protected $on = [];
+    protected array $on = [];
 
     /**
-     * Join Contructor.
+     * Join Constructor.
      *
-     * @param  string  $table  table name
-     * @param  string  $type   type of join
+     * @param string $table  table name
+     * @param string|null $type   type of join
      */
-    public function __construct($table, $type = null)
+    public function __construct(string $table, ?string $type = null)
     {
         $this->table = $table;
         $this->type = $type;
@@ -44,11 +44,11 @@ class Join
     /**
      * Adds an 'on' clause for the join.
      *
-     * @param   string|array  $column  string column name or array for alias
-     * @param   string        $op      logic operator
-     * @param   string|array  $value   value or array for alias
+     * @param array|string $column  string column name or array for alias
+     * @param string|null $op      logic operator
+     * @param array|string|null $value   value or array for alias
      */
-    public function on($column, $op = null, $value = null)
+    public function on(array|string $column, string $op = null, array|string $value = null): void
     {
         if (func_num_args() === 2) {
             $value = $op;
@@ -61,11 +61,11 @@ class Join
     /**
      * Adds an 'on' clause for the join.
      *
-     * @param   string|array  $column  string column name or array for alias
-     * @param   string        $op      logic operator
-     * @param   string|array  $value   value or array for alias
+     * @param array|string $column  string column name or array for alias
+     * @param string|null $op      logic operator
+     * @param array|string|null $value   value or array for alias
      */
-    public function andOn($column, $op = null, $value = null)
+    public function andOn(array|string $column, string $op = null, array|string $value = null): void
     {
         call_user_func_array([$this, 'on'], func_get_args());
     }
@@ -73,11 +73,11 @@ class Join
     /**
      * Adds an 'on' clause for the join.
      *
-     * @param   string|array  $column  string column name or array for alias
-     * @param   string        $op      logic operator
-     * @param   string|array  $value   value or array for alias
+     * @param array|string $column  string column name or array for alias
+     * @param string|null $op      logic operator
+     * @param array|string|null $value   value or array for alias
      */
-    public function orOn($column, $op = null, $value = null)
+    public function orOn(array|string $column, string $op = null, array|string $value = null): void
     {
         if (func_num_args() === 2) {
             $value = $op;
@@ -92,7 +92,7 @@ class Join
      *
      * @return array Join command array.
      */
-    public function asArray()
+    public function asArray(): array
     {
         return [
             'table' => $this->table,
