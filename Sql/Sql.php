@@ -24,6 +24,7 @@ use function extract;
 use function implode;
 use function is_array;
 use function method_exists;
+use function Qubus\Support\Helpers\value;
 use function stripos;
 use function strtoupper;
 use function substr;
@@ -33,11 +34,11 @@ use function ucfirst;
 abstract class Sql extends Compiler
 {
     /**
-     * Compiles an insert query
+     * Compiles an insert query.
      *
-     * @return  string  compiled INSERT query
+     * @return  string  compiled INSERT query.
      */
-    public function compileSelect()
+    public function compileSelect(): string
     {
         $sql = $this->compilePartSelect();
         $sql .= $this->compilePartFrom();
@@ -51,11 +52,11 @@ abstract class Sql extends Compiler
     }
 
     /**
-     * Compiles an update query
+     * Compiles an update query.
      *
-     * @return  string  compiled UPDATE query
+     * @return  string  compiled UPDATE query.
      */
-    public function compileUpdate()
+    public function compileUpdate(): string
     {
         $sql = $this->compilePartUpdate();
         $sql .= $this->compilePartSet();
@@ -66,11 +67,11 @@ abstract class Sql extends Compiler
     }
 
     /**
-     * Compiles a delete query
+     * Compiles a delete query.
      *
-     * @return  string  compiled DELETE query
+     * @return  string  compiled DELETE query.
      */
-    public function compileDelete()
+    public function compileDelete(): string
     {
         $sql = $this->compilePartDelete();
         $sql .= $this->compilePartWhere();
@@ -80,11 +81,11 @@ abstract class Sql extends Compiler
     }
 
     /**
-     * Compiles an insert query
+     * Compiles an insert query.
      *
-     * @return  string  compiled INSERT query
+     * @return  string  compiled INSERT query.
      */
-    public function compileInsert()
+    public function compileInsert(): string
     {
         $sql = $this->compilePartInsert();
         $sql .= $this->compilePartInsertValues();
@@ -92,15 +93,15 @@ abstract class Sql extends Compiler
     }
 
     /**
-     * Compiles field parts
+     * Compiles field parts.
      *
-     * @param   string  $type  field/query type
-     * @return  string  compiled field sql
+     * @param string $type  field/query type.
+     * @return  string  compiled field sql.
      */
-    protected function compilePartFields($type)
+    protected function compilePartFields(string $type): string
     {
         $fieldsSql = [];
-        $fields = $this->prepareFields($this->query['fields']);
+        $fields = $this->prepareFields(fields: $this->query['fields']);
 
         foreach ($fields as $data) {
             if ($type === 'alter') {
@@ -111,22 +112,22 @@ abstract class Sql extends Compiler
                 }
             }
 
-            $fsql = $type !== 'create' ? strtoupper($type) . ' ' : '';
-            $fsql .= $this->quoteIdentifier($data['name']) . ' ';
+            $fsql = $type !== 'create' ? strtoupper(string: $type) . ' ' : '';
+            $fsql .= $this->quoteIdentifier(identifier: $data['name']) . ' ';
 
             if ($data['newName']) {
                 $fsql .= $this->quoteIdentifier($data['newName']) . ' ';
             }
 
-            $fsql .= strtoupper($data['type']);
+            $fsql .= strtoupper(string: $data['type']);
 
             if ($data['constraint']) {
-                $constraint = is_array($data['constraint']) ? $data['constraint'] : [$data['constraint']];
-                $fsql .= '(' . implode(', ', array_map([$this, 'quote'], $constraint)) . ')';
+                $constraint = is_array(value: $data['constraint']) ? $data['constraint'] : [$data['constraint']];
+                $fsql .= '(' . implode(separator: ', ', array: array_map(callback: [$this, 'quote'], array: $constraint)) . ')';
             }
 
             if ($data['charset']) {
-                $fsql .= ' ' . $this->compilePartCharset($data['charset']);
+                $fsql .= ' ' . $this->compilePartCharset(charset: $data['charset']);
             }
 
             if ($data['primary']) {
@@ -138,7 +139,7 @@ abstract class Sql extends Compiler
             }
 
             if ($data['defaultValue']) {
-                $fsql .= ' DEFAULT ' . $this->quote($data['defaultValue']);
+                $fsql .= ' DEFAULT ' . $this->quote(value: $data['defaultValue']);
             }
 
             if ($data['nullable']) {
@@ -156,38 +157,38 @@ abstract class Sql extends Compiler
             }
 
             if ($data['after']) {
-                $fsql .= ' AFTER ' . $this->quoteIdentifier($data['after']);
+                $fsql .= ' AFTER ' . $this->quoteIdentifier(identifier: $data['after']);
             }
 
             if ($data['comments']) {
-                $fsql .= ' COMMENT ' . $this->quote($data['comments']);
+                $fsql .= ' COMMENT ' . $this->quote(value: $data['comments']);
             }
 
             $fieldsSql[] = $fsql;
         }
 
-        return implode(', ', $fieldsSql);
+        return implode(separator: ', ', array: $fieldsSql);
     }
 
     /**
      * Prepares the fields for rendering.
      *
-     * @param   array  $fields  array with field objects
-     * @return  array  array with prepped field objects
+     * @param array $fields  array with field objects.
+     * @return array  array with prepped field objects.
      */
-    protected function prepareFields($fields)
+    protected function prepareFields(array $fields): array
     {
-        return array_map(function ($field) {
+        return array_map(callback: function ($field) {
             return $field->getContents();
-        }, $fields);
+        }, array: $fields);
     }
 
     /**
-     * Compiles the ENGINE statement
+     * Compiles the ENGINE statement.
      *
-     * @return  string  compiled ENGINE statement
+     * @return  string  compiled ENGINE statement.
      */
-    protected function compilePartEngine()
+    protected function compilePartEngine(): string
     {
         return $this->query['engine'] ? ' ENGINE = ' . $this->query['engine'] : '';
     }
@@ -195,17 +196,17 @@ abstract class Sql extends Compiler
     /**
      * Compiles charset statements.
      *
-     * @param   string  $charset  charset to compile
-     * @return  string  compiled charset statement
+     * @param string $charset  charset to compile.
+     * @return string compiled charset statement.
      */
-    protected function compilePartCharset($charset)
+    protected function compilePartCharset(string $charset): string
     {
         if (empty($charset)) {
             return '';
         }
 
-        if (($pos = stripos($charset, '_')) !== false) {
-            $charset = ' CHARACTER SET ' . substr($charset, 0, $pos) . ' COLLATE ' . $charset;
+        if (($pos = stripos(haystack: $charset, needle: '_')) !== false) {
+            $charset = ' CHARACTER SET ' . substr(string: $charset, offset: 0, length: $pos) . ' COLLATE ' . $charset;
         } else {
             $charset = ' CHARACTER SET ' . $charset;
         }
@@ -218,17 +219,17 @@ abstract class Sql extends Compiler
     /**
      * Compiles conditions for where and having statements.
      *
-     * @param   array   $conditions  conditions array
-     * @return  string  compiled conditions
+     * @param array $conditions  conditions array.
+     * @return string  compiled conditions.
      */
-    protected function compileConditions($conditions)
+    protected function compileConditions(array $conditions): string
     {
         $parts = [];
         $last = false;
 
         foreach ($conditions as $c) {
             if (isset($c['type']) && count($parts) > 0) {
-                $parts[] = ' ' . strtoupper($c['type']) . ' ';
+                $parts[] = ' ' . strtoupper(string: $c['type']) . ' ';
             }
 
             if ($useNot = isset($c['not']) && $c['not']) {
@@ -263,7 +264,7 @@ abstract class Sql extends Compiler
                 }
 
                 $last = false;
-                $c['op'] = trim($c['op']);
+                $c['op'] = trim(string: $c['op']);
 
                 if ($c['value'] === null) {
                     if ($c['op'] === '!=') {
@@ -273,40 +274,40 @@ abstract class Sql extends Compiler
                     }
                 }
 
-                $c['op'] = strtoupper($c['op']);
+                $c['op'] = strtoupper(string: $c['op']);
 
-                if ($c['op'] === 'BETWEEN' && is_array($c['value'])) {
+                if ($c['op'] === 'BETWEEN' && is_array(value: $c['value'])) {
                     [$min, $max] = $c['value'];
-                    $c['value'] = $this->quote($min) . ' AND ' . $this->quote($max);
+                    $c['value'] = $this->quote(value: $min) . ' AND ' . $this->quote(value: $max);
                 } else {
-                    $c['value'] = $this->quote($c['value']);
+                    $c['value'] = $this->quote(value: $c['value']);
                 }
 
-                $c['field'] = $this->quoteIdentifier($c['field']);
+                $c['field'] = $this->quoteIdentifier(identifier: $c['field']);
                 $parts[] = $c['field'] . ' ' . $c['op'] . ' ' . $c['value'];
             }
         }
 
-        return trim(implode('', $parts));
+        return trim(string: implode(separator: '', array: $parts));
     }
 
     /**
      * Compiles SQL functions
      *
-     * @param   object  $value   function object
-     * @return  string  compiles SQL function
+     * @param object $value   function object.
+     * @return  string  compiles SQL function.
      */
-    public function compilePartFnc($value)
+    public function compilePartFnc(object $value): string
     {
-        $fnc = ucfirst($value->getFnc());
+        $fnc = ucfirst(string: $value->getFnc());
 
-        if (method_exists($this, 'compileFnc' . $fnc)) {
+        if (method_exists(object_or_class: $this, method: 'compileFnc' . $fnc)) {
             return $this->{'compilFnc' . $fnc}($value);
         }
 
         $quoteFnc = $value->quoteAs() === 'identifier' ? 'quoteIdentifier' : 'quote';
 
-        return strtoupper($fnc) . '(' . implode(', ', array_map([$this, $quoteFnc], $value->getParams())) . ')';
+        return strtoupper(string: $fnc) . '(' . implode(separator: ', ', array: array_map(callback: [$this, $quoteFnc], array: $value->getParams())) . ')';
     }
 
     /**
@@ -314,46 +315,46 @@ abstract class Sql extends Compiler
      *
      * @return  string  compiled inter into part
      */
-    protected function compilePartInsert()
+    protected function compilePartInsert(): string
     {
-        return 'INSERT INTO ' . $this->quoteIdentifier($this->query['table']);
+        return 'INSERT INTO ' . $this->quoteIdentifier(identifier: $this->query['table']);
     }
 
     /**
      * Compiles the insert values.
      *
-     * @return  string  compiled values part
+     * @return  string  compiled values part.
      */
-    protected function compilePartInsertValues()
+    protected function compilePartInsertValues(): string
     {
-        $columns = array_map([$this, 'quoteIdentifier'], $this->query['columns']);
-        $sql = ' (' . implode(', ', $columns) . ') VALUES (';
+        $columns = array_map(callback: [$this, 'quoteIdentifier'], array: $this->query['columns']);
+        $sql = ' (' . implode(separator: ', ', array: $columns) . ') VALUES (';
         $parts = [];
 
         foreach ($this->query['values'] as $row) {
             foreach ($this->query['columns'] as $c) {
-                if (array_key_exists($c, $row)) {
-                    $parts[] = $this->quote($row[$c]);
+                if (array_key_exists(key: $c, array: $row)) {
+                    $parts[] = $this->quote(value: $row[$c]);
                 } else {
                     $parts[] = 'NULL';
                 }
             }
         }
 
-        return $sql . implode(', ', $parts) . ')';
+        return $sql . implode(separator: ', ', array: $parts) . ')';
     }
 
     /**
      * Compiles a select part.
      *
-     * @return  string  compiled select part
+     * @return  string  compiled select part.
      */
-    protected function compilePartSelect()
+    protected function compilePartSelect(): string
     {
         $columns = $this->query['columns'];
         empty($columns) && $columns = ['*'];
-        $columns = array_map([$this, 'quoteIdentifier'], $columns);
-        return 'SELECT' . ($this->query['distinct'] === true ? ' DISTINCT ' : ' ') . trim(implode(', ', $columns));
+        $columns = array_map(callback: [$this, 'quoteIdentifier'], array: $columns);
+        return 'SELECT' . ($this->query['distinct'] === true ? ' DISTINCT ' : ' ') . trim(string: implode(separator: ', ', array: $columns));
     }
 
     /**
@@ -361,9 +362,9 @@ abstract class Sql extends Compiler
      *
      * @return  string  compiled delete part
      */
-    protected function compilePartDelete()
+    protected function compilePartDelete(): string
     {
-        return 'DELETE FROM ' . $this->quoteIdentifier($this->query['table']);
+        return 'DELETE FROM ' . $this->quoteIdentifier(identifier: $this->query['table']);
     }
 
     /**
@@ -371,9 +372,9 @@ abstract class Sql extends Compiler
      *
      * @return  string  compiled update part
      */
-    protected function compilePartUpdate()
+    protected function compilePartUpdate(): string
     {
-        return 'UPDATE ' . $this->quoteIdentifier($this->query['table']);
+        return 'UPDATE ' . $this->quoteIdentifier(identifier: $this->query['table']);
     }
 
     /**
@@ -381,11 +382,11 @@ abstract class Sql extends Compiler
      *
      * @return  string  compiled from part
      */
-    protected function compilePartFrom()
+    protected function compilePartFrom(): string
     {
         $tables = $this->query['table'];
-        is_array($tables) || $tables = [$tables];
-        return ' FROM ' . implode(', ', array_map([$this, 'quoteIdentifier'], $tables));
+        is_array(value: $tables) || $tables = [$tables];
+        return ' FROM ' . implode(separator: ', ', array: array_map(callback: [$this, 'quoteIdentifier'], array: $tables));
     }
 
     /**
@@ -393,11 +394,11 @@ abstract class Sql extends Compiler
      *
      * @return  string  compiled where part
      */
-    protected function compilePartWhere()
+    protected function compilePartWhere(): string
     {
         if (! empty($this->query['where'])) {
             // Add selection conditions
-            return ' WHERE ' . $this->compileConditions($this->query['where']);
+            return ' WHERE ' . $this->compileConditions(conditions: $this->query['where']);
         }
 
         return '';
@@ -408,16 +409,16 @@ abstract class Sql extends Compiler
      *
      * @return string Compiled set part.
      */
-    protected function compilePartSet()
+    protected function compilePartSet(): string
     {
         if (! empty($this->query['values'])) {
             $parts = [];
 
             foreach ($this->query['values'] as $k => $v) {
-                $parts[] = $this->quoteIdentifier($k) . ' = ' . $this->quote($v);
+                $parts[] = $this->quoteIdentifier(identifier: $k) . ' = ' . $this->quote(value: $v);
             }
 
-            return ' SET ' . implode(', ', $parts);
+            return ' SET ' . implode(separator: ', ', array: $parts);
         }
 
         return '';
@@ -428,11 +429,11 @@ abstract class Sql extends Compiler
      *
      * @return  string  compiled HAVING statement
      */
-    protected function compilePartHaving()
+    protected function compilePartHaving(): string
     {
         if (! empty($this->query['having'])) {
             // Add selection conditions
-            return ' HAVING ' . $this->compileConditions($this->query['having']);
+            return ' HAVING ' . $this->compileConditions(conditions: $this->query['having']);
         }
 
         return '';
@@ -443,7 +444,7 @@ abstract class Sql extends Compiler
      *
      * @return  string  compiled order by part
      */
-    protected function compilePartOrderBy()
+    protected function compilePartOrderBy(): string
     {
         if (! empty($this->query['orderBy'])) {
             $sort = [];
@@ -453,13 +454,13 @@ abstract class Sql extends Compiler
 
                 if (! empty($direction)) {
                     // Make the direction uppercase
-                    $direction = ' ' . strtoupper($direction);
+                    $direction = ' ' . strtoupper(string: $direction);
                 }
 
-                $sort[] = $this->quoteIdentifier($column) . $direction;
+                $sort[] = $this->quoteIdentifier(identifier: $column) . $direction;
             }
 
-            return ' ORDER BY ' . implode(', ', $sort);
+            return ' ORDER BY ' . implode(separator: ', ', array: $sort);
         }
 
         return '';
@@ -470,7 +471,7 @@ abstract class Sql extends Compiler
      *
      * @return  string  compiled join part
      */
-    protected function compilePartJoin()
+    protected function compilePartJoin(): string
     {
         if (empty($this->query['join'])) {
             return '';
@@ -482,13 +483,13 @@ abstract class Sql extends Compiler
             $join = $join->asArray();
 
             if ($join['type']) {
-                $sql = strtoupper($join['type']) . ' JOIN';
+                $sql = strtoupper(string: $join['type']) . ' JOIN';
             } else {
                 $sql = 'JOIN';
             }
 
             // Quote the table name that is being joined
-            $sql .= ' ' . $this->quoteIdentifier($join['table']) . ' ON ';
+            $sql .= ' ' . $this->quoteIdentifier(identifier: $join['table']) . ' ON ';
 
             $onSql = '';
             foreach ($join['on'] as $condition) {
@@ -497,11 +498,11 @@ abstract class Sql extends Compiler
 
                 if ($op) {
                     // Make the operator uppercase and spaced
-                    $op = ' ' . strtoupper($op);
+                    $op = ' ' . strtoupper(string: $op);
                 }
 
                 // Quote each of the identifiers used for the condition
-                $onSql .= (empty($onSql) ? '' : ' ' . $andOr . ' ') . $this->quoteIdentifier($c1) . $op . ' ' . $this->quoteIdentifier($c2);
+                $onSql .= (empty($onSql) ? '' : ' ' . $andOr . ' ') . $this->quoteIdentifier(identifier: $c1) . $op . ' ' . $this->quoteIdentifier(identifier: $c2);
             }
 
             // Concat the conditions "... AND ..."
@@ -510,7 +511,7 @@ abstract class Sql extends Compiler
             $return[] = $sql;
         }
 
-        return ' ' . implode(' ', $return);
+        return ' ' . implode(separator: ' ', array: $return);
     }
 
     /**
@@ -522,7 +523,7 @@ abstract class Sql extends Compiler
     {
         if (! empty($this->query['groupBy'])) {
             // Add sorting
-            return ' GROUP BY ' . implode(', ', array_map([$this, 'quoteIdentifier'], $this->query['groupBy']));
+            return ' GROUP BY ' . implode(separator: ', ', array: array_map(callback: [$this, 'quoteIdentifier'], array: $this->query['groupBy']));
         }
 
         return '';
@@ -551,10 +552,10 @@ abstract class Sql extends Compiler
     /**
      * Escapes a value.
      *
-     * @param   string  $value  value to escape
+     * @param string $value  value to escape
      * @return  string  escaped string
      */
-    public function escape($value)
+    public function escape(string $value): string
     {
         return $this->connection->quote($value);
     }

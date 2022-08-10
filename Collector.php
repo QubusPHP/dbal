@@ -19,14 +19,14 @@ use function get_object_vars;
 class Collector extends Base
 {
     /** @var  array|string  $table  tables to use */
-    public $table = [];
+    public string|array $table = [];
 
     /**
      * Get the query contents
      *
-     * @return  array  query contents
+     * @return mixed query contents.
      */
-    public function getContents()
+    public function getContents(): mixed
     {
         $return = [];
         $vars = get_object_vars($this);

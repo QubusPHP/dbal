@@ -1,6 +1,9 @@
 .DS_Store
 /nbproject/
 /vendor/
-index.php
+.idea
 .phpcs-cache
-QueryBuilder.php
+.phpunit.result.cache
+composer.lock
+phpunit.xml
+index.php

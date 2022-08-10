@@ -21,9 +21,9 @@ class Value extends Expression
     /**
      * Handles value quoting.
      *
-     * @return string Quoted identifier.
+     * @return Compiler $compiler Quoted identifier.
      */
-    public function handle(Compiler $compiler)
+    public function handle($compiler): mixed
     {
         return $compiler->quote($this->value);
     }

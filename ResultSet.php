@@ -36,11 +36,12 @@ use PDOStatement;
 
 use function call_user_func_array;
 use function is_array;
+use function Qubus\Support\Helpers\is_null__;
 
 class ResultSet
 {
     /** @var PDOStatement The PDOStatement associated with this result set. */
-    protected $statement;
+    protected PDOStatement $statement;
 
     /**
      * Constructor
@@ -65,36 +66,36 @@ class ResultSet
      *
      * @return  int
      */
-    public function count()
+    public function count(): int
     {
         return $this->statement->rowCount();
     }
 
     /**
-     * Fetch all results
+     * Fetch all results.
      *
-     * @param   callable $callable (optional) Callback function
-     * @param   int $fetchStyle (optional) PDO fetch style
-     * @return  array
+     * @param callable|null $callable (optional) Callback function
+     * @param int $fetchStyle (optional) PDO fetch style
+     * @return array|false
      */
-    public function all($callable = null, $fetchStyle = 0)
+    public function all(?callable $callable = null, int $fetchStyle = 0): array|false
     {
-        if ($callable === null) {
-            return $this->statement->fetchAll($fetchStyle);
+        if (is_null__(var: $callable)) {
+            return $this->statement->fetchAll(mode: $fetchStyle);
         }
         return $this->statement->fetchAll($fetchStyle | PDO::FETCH_FUNC, $callable);
     }
 
     /**
-     * @param   bool $uniq (optional)
-     * @param   callable $callable (optional)
-     * @return  array
+     * @param bool $uniq (optional)
+     * @param callable|null $callable (optional)
+     * @return array|false
      */
-    public function allGroup($uniq = false, $callable = null)
+    public function allGroup(bool $uniq = false, ?callable $callable = null): array|false
     {
         $fetchStyle = PDO::FETCH_GROUP | ($uniq ? PDO::FETCH_UNIQUE : 0);
-        if ($callable === null) {
-            return $this->statement->fetchAll($fetchStyle);
+        if (is_null__($callable)) {
+            return $this->statement->fetchAll(mode: $fetchStyle);
         }
         return $this->statement->fetchAll($fetchStyle | PDO::FETCH_FUNC, $callable);
     }
@@ -102,16 +103,16 @@ class ResultSet
     /**
      * Fetch first result
      *
-     * @param   callable $callable (optional) Callback function
+     * @param callable|null $callable (optional) Callback function
      * @return  mixed
      */
-    public function first($callable = null)
+    public function first(?callable $callable = null): mixed
     {
         if ($callable !== null) {
             $result = $this->statement->fetch(PDO::FETCH_ASSOC);
             $this->statement->closeCursor();
-            if (is_array($result)) {
-                $result = call_user_func_array($callable, $result);
+            if (is_array(value: $result)) {
+                $result = call_user_func_array(callback: $callable, args: $result);
             }
         } else {
             $result = $this->statement->fetch();
@@ -126,7 +127,7 @@ class ResultSet
      *
      * @return  mixed
      */
-    public function next()
+    public function next(): mixed
     {
         return $this->statement->fetch();
     }
@@ -134,9 +135,9 @@ class ResultSet
     /**
      * Close current cursor
      *
-     * @return  mixed
+     * @return  bool
      */
-    public function flush()
+    public function flush(): bool
     {
         return $this->statement->closeCursor();
     }
@@ -144,10 +145,10 @@ class ResultSet
     /**
      * Return a column
      *
-     * @param   int $col 0-indexed number of the column you wish to retrieve
+     * @param int $col 0-indexed number of the column you wish to retrieve
      * @return  mixed
      */
-    public function column($col = 0)
+    public function column(int $col = 0): mixed
     {
         return $this->statement->fetchColumn($col);
     }
@@ -157,9 +158,9 @@ class ResultSet
      *
      * @return  $this
      */
-    public function fetchAssoc()
+    public function fetchAssoc(): static
     {
-        $this->statement->setFetchMode(PDO::FETCH_ASSOC);
+        $this->statement->setFetchMode(mode: PDO::FETCH_ASSOC);
         return $this;
     }
 
@@ -168,54 +169,54 @@ class ResultSet
      *
      * @return  $this
      */
-    public function fetchObject()
+    public function fetchObject(): static
     {
-        $this->statement->setFetchMode(PDO::FETCH_OBJ);
+        $this->statement->setFetchMode(mode: PDO::FETCH_OBJ);
         return $this;
     }
 
     /**
      * @return  $this
      */
-    public function fetchNamed()
+    public function fetchNamed(): static
     {
-        $this->statement->setFetchMode(PDO::FETCH_NAMED);
+        $this->statement->setFetchMode(mode: PDO::FETCH_NAMED);
         return $this;
     }
 
     /**
      * @return  $this
      */
-    public function fetchNum()
+    public function fetchNum(): static
     {
-        $this->statement->setFetchMode(PDO::FETCH_NUM);
+        $this->statement->setFetchMode(mode: PDO::FETCH_NUM);
         return $this;
     }
 
     /**
      * @return  $this
      */
-    public function fetchBoth()
+    public function fetchBoth(): static
     {
-        $this->statement->setFetchMode(PDO::FETCH_BOTH);
+        $this->statement->setFetchMode(mode: PDO::FETCH_BOTH);
         return $this;
     }
 
     /**
      * @return  $this
      */
-    public function fetchKeyPair()
+    public function fetchKeyPair(): static
     {
-        $this->statement->setFetchMode(PDO::FETCH_KEY_PAIR);
+        $this->statement->setFetchMode(mode: PDO::FETCH_KEY_PAIR);
         return $this;
     }
 
     /**
-     * @param   string $class
-     * @param   array $ctorargs (optional)
-     * @return  $this
+     * @param string $class
+     * @param array $ctorargs (optional)
+     * @return $this
      */
-    public function fetchClass($class, array $ctorargs = [])
+    public function fetchClass(string $class, array $ctorargs = []): static
     {
         $this->statement->setFetchMode(PDO::FETCH_CLASS, $class, $ctorargs);
         return $this;
@@ -224,7 +225,7 @@ class ResultSet
     /**
      * @return  $this
      */
-    public function fetchCustom(Closure $func)
+    public function fetchCustom(Closure $func): static
     {
         $func($this->statement);
         return $this;

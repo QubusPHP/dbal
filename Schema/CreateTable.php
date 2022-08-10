@@ -32,17 +32,18 @@ namespace Qubus\Dbal\Schema;
 
 use function implode;
 use function is_array;
+use function Qubus\Support\Helpers\is_null__;
 
 class CreateTable
 {
     /** @var CreateColumn[] $columns */
-    protected $columns = [];
+    protected array $columns = [];
 
     /** @var string|string[] $primaryKey */
-    protected $primaryKey;
+    protected string|array|null $primaryKey = null;
 
     /** @var string[] $uniqueKeys */
-    protected $uniqueKeys = [];
+    protected array $uniqueKeys = [];
 
     /** @var array $indexes */
     protected array $indexes = [];
@@ -50,12 +51,14 @@ class CreateTable
     /** @var array $foreignKeys */
     protected array $foreignKeys = [];
 
+    /** @var string */
     protected string $table;
 
+    /** @var string|null */
     protected ?string $engine = null;
 
-    /** @var bool|null $autoincrement */
-    protected $autoincrement;
+    /** @var BaseColumn $autoincrement */
+    protected BaseColumn $autoincrement;
 
     public function __construct(string $table)
     {
@@ -64,7 +67,7 @@ class CreateTable
 
     protected function addColumn(string $name, string $type): CreateColumn
     {
-        $column = new CreateColumn($this, $name, $type);
+        $column = new CreateColumn(table: $this, name: $name, type: $type);
         $this->columns[$name] = $column;
         return $column;
     }
@@ -83,9 +86,9 @@ class CreateTable
     }
 
     /**
-     * @return  mixed
+     * @return string|array|null
      */
-    public function getPrimaryKey()
+    public function getPrimaryKey(): string|array|null
     {
         return $this->primaryKey;
     }
@@ -93,7 +96,7 @@ class CreateTable
     /**
      * @return  array
      */
-    public function getUniqueKeys()
+    public function getUniqueKeys(): array
     {
         return $this->uniqueKeys;
     }
@@ -101,7 +104,7 @@ class CreateTable
     /**
      * @return  array
      */
-    public function getIndexes()
+    public function getIndexes(): array
     {
         return $this->indexes;
     }
@@ -109,23 +112,23 @@ class CreateTable
     /**
      * @return  array
      */
-    public function getForeignKeys()
+    public function getForeignKeys(): array
     {
         return $this->foreignKeys;
     }
 
     /**
-     * @return  mixed
+     * @return  string|null
      */
-    public function getEngine()
+    public function getEngine(): ?string
     {
         return $this->engine;
     }
 
     /**
-     * @return  mixed
+     * @return  BaseColumn
      */
-    public function getAutoincrement()
+    public function getAutoincrement(): BaseColumn
     {
         return $this->autoincrement;
     }
@@ -143,14 +146,14 @@ class CreateTable
      * @param string|string[] $columns
      * @return $this
      */
-    public function primary($columns, ?string $name = null): self
+    public function primary(array|string $columns, ?string $name = null): self
     {
-        if (! is_array($columns)) {
+        if (! is_array(value: $columns)) {
             $columns = [$columns];
         }
 
-        if ($name === null) {
-            $name = $this->table . '_pk_' . implode('_', $columns);
+        if (is_null__(var: $name)) {
+            $name = $this->table . '_pk_' . implode(separator: '_', array: $columns);
         }
 
         $this->primaryKey = [
@@ -165,14 +168,14 @@ class CreateTable
      * @param string|string[] $columns
      * @return $this
      */
-    public function unique($columns, ?string $name = null): self
+    public function unique(array|string $columns, ?string $name = null): self
     {
-        if (! is_array($columns)) {
+        if (! is_array(value: $columns)) {
             $columns = [$columns];
         }
 
-        if ($name === null) {
-            $name = $this->table . '_uk_' . implode('_', $columns);
+        if (is_null__(var: $name)) {
+            $name = $this->table . '_uk_' . implode(separator: '_', array: $columns);
         }
 
         $this->uniqueKeys[$name] = $columns;
@@ -184,14 +187,14 @@ class CreateTable
      * @param string|string[] $columns
      * @return $this
      */
-    public function index($columns, ?string $name = null)
+    public function index(array|string $columns, ?string $name = null): self
     {
-        if (! is_array($columns)) {
+        if (! is_array(value: $columns)) {
             $columns = [$columns];
         }
 
-        if ($name === null) {
-            $name = $this->table . '_ik_' . implode('_', $columns);
+        if (is_null__(var: $name)) {
+            $name = $this->table . '_ik_' . implode(separator: '_', array: $columns);
         }
 
         $this->indexes[$name] = $columns;
@@ -202,17 +205,17 @@ class CreateTable
     /**
      * @param string|string[] $columns
      */
-    public function foreign($columns, ?string $name = null): ForeignKey
+    public function foreign(array|string $columns, ?string $name = null): ForeignKey
     {
-        if (! is_array($columns)) {
+        if (! is_array(value: $columns)) {
             $columns = [$columns];
         }
 
-        if ($name === null) {
-            $name = $this->table . '_fk_' . implode('_', $columns);
+        if (is_null__(var: $name)) {
+            $name = $this->table . '_fk_' . implode(separator: '_', array: $columns);
         }
 
-        return $this->foreignKeys[$name] = new ForeignKey($columns);
+        return $this->foreignKeys[$name] = new ForeignKey(columns: $columns);
     }
 
     /**
@@ -230,67 +233,67 @@ class CreateTable
 
     public function integer(string $name): CreateColumn
     {
-        return $this->addColumn($name, 'integer');
+        return $this->addColumn(name: $name, type: 'integer');
     }
 
     public function float(string $name): CreateColumn
     {
-        return $this->addColumn($name, 'float');
+        return $this->addColumn(name: $name, type: 'float');
     }
 
     public function double(string $name): CreateColumn
     {
-        return $this->addColumn($name, 'double');
+        return $this->addColumn(name: $name, type: 'double');
     }
 
     public function decimal(string $name, ?int $length = null, ?int $precision = null): CreateColumn
     {
-        return $this->addColumn($name, 'decimal')->length($length)->set('precision', $precision);
+        return $this->addColumn(name: $name, type: 'decimal')->length(value: $length)->set(name: 'precision', value: $precision);
     }
 
     public function boolean(string $name): CreateColumn
     {
-        return $this->addColumn($name, 'boolean');
+        return $this->addColumn(name: $name, type: 'boolean');
     }
 
     public function binary(string $name): CreateColumn
     {
-        return $this->addColumn($name, 'binary');
+        return $this->addColumn(name: $name, type: 'binary');
     }
 
     public function string(string $name, int $length = 255): CreateColumn
     {
-        return $this->addColumn($name, 'string')->length($length);
+        return $this->addColumn(name: $name, type: 'string')->length(value: $length);
     }
 
     public function fixed(string $name, int $length = 255): CreateColumn
     {
-        return $this->addColumn($name, 'fixed')->length($length);
+        return $this->addColumn(name: $name, type: 'fixed')->length(value: $length);
     }
 
     public function text(string $name): CreateColumn
     {
-        return $this->addColumn($name, 'text');
+        return $this->addColumn(name: $name, type: 'text');
     }
 
     public function time(string $name): CreateColumn
     {
-        return $this->addColumn($name, 'time');
+        return $this->addColumn(name: $name, type: 'time');
     }
 
     public function timestamp(string $name): CreateColumn
     {
-        return $this->addColumn($name, 'timestamp');
+        return $this->addColumn(name: $name, type: 'timestamp');
     }
 
     public function date(string $name): CreateColumn
     {
-        return $this->addColumn($name, 'date');
+        return $this->addColumn(name: $name, type: 'date');
     }
 
     public function dateTime(string $name): CreateColumn
     {
-        return $this->addColumn($name, 'dateTime');
+        return $this->addColumn(name: $name, type: 'dateTime');
     }
 
     /**
@@ -298,7 +301,7 @@ class CreateTable
      */
     public function softDelete(string $column = 'deleted_at'): self
     {
-        $this->dateTime($column);
+        $this->dateTime(name: $column);
         return $this;
     }
 
@@ -307,8 +310,8 @@ class CreateTable
      */
     public function timestamps(string $createColumn = 'created_at', string $updateColumn = 'updated_at'): self
     {
-        $this->dateTime($createColumn)->notNull();
-        $this->dateTime($updateColumn);
+        $this->dateTime(name: $createColumn)->notNull();
+        $this->dateTime(name: $updateColumn);
         return $this;
     }
 }

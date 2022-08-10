@@ -23,12 +23,12 @@ class Sqlite extends Sql
     /**
      * Prepares the fields for rendering.
      *
-     * @param   array  $fields  array with field objects
+     * @param array $fields  array with field objects
      * @return  array  array with prepped field objects
      */
-    protected function prepareFields($fields)
+    protected function prepareFields(array $fields): array
     {
-        return array_map(function ($field) {
+        return array_map(callback: function ($field) {
             $data = $field->getContents();
 
             if ($data['incremental']) {
@@ -38,6 +38,6 @@ class Sqlite extends Sql
             }
 
             return $data;
-        }, $fields);
+        }, array: $fields);
     }
 }

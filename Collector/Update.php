@@ -21,7 +21,9 @@ use function is_array;
 class Update extends Where
 {
     /** @var  string  $type  query type */
-    protected $type = DB::UPDATE;
+    protected string $type = DB::UPDATE;
+
+    protected array $values;
 
     /**
      * Constructor, sets the table name
@@ -34,10 +36,9 @@ class Update extends Where
     /**
      * Sets the table to update
      *
-     * @param   string  $table  table to update
-     * @return  object  $this
+     * @param string $table  table to update
      */
-    public function table($table)
+    public function table(string $table): static
     {
         $this->table = $table;
 
@@ -48,12 +49,11 @@ class Update extends Where
      * Set the new values
      *
      * @param   mixed   $key    string field name or associative values array
-     * @param   mixed   $value  new value
-     * @return  object  $this
+     * @param mixed|null $value  new value
      */
-    public function set($key, $value = null)
+    public function set(mixed $key, mixed $value = null): static
     {
-        is_array($key) || $key = [$key => $value];
+        is_array(value: $key) || $key = [$key => $value];
 
         foreach ($key as $k => $v) {
             $this->values[$k] = $v;

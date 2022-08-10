@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         verbose="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false">
+    <testsuites>
+        <testsuite name="Qubus Database Test Suite">
+            <directory>Tests</directory>
+        </testsuite>
+    </testsuites>
+    <coverage>
+        <include>
+            <directory>Collector</directory>
+            <directory>Connection</directory>
+            <directory>Schema</directory>
+            <directory>Sql</directory>
+            <file>Base.php</file>
+            <file>Collector.php</file>
+            <file>Connection.php</file>
+            <file>DB.php</file>
+            <file>DsnGenerator.php</file>
+            <file>Expression.php</file>
+            <file>Fnc.php</file>
+            <file>Identifier.php</file>
+            <file>Query.php</file>
+            <file>ResultSet.php</file>
+            <file>Schema.php</file>
+            <file>Value.php</file>
+        </include>
+    </coverage>
+</phpunit>

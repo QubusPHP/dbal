@@ -27,33 +27,33 @@ use function is_array;
 
 class Select extends Where
 {
-    /** @var  int  $type  query type */
-    protected $type = DB::SELECT;
+    /** @var string $type  query type */
+    protected string $type = DB::SELECT;
 
-    /** @var  array  $having  having conditions */
+    /** @var array $having  having conditions */
     public array $having = [];
 
-    /** @var  array  $groupBy  GROUP BY clause */
+    /** @var array $groupBy  GROUP BY clause */
     public array $groupBy = [];
 
-    /** @var  object  $lastJoin  last join object */
-    protected $lastJoin;
+    /** @var Join $lastJoin Last join object */
+    protected Join $lastJoin;
 
-    /** @var  array  $joins  query joins */
+    /** @var array $joins  query joins */
     public array $joins = [];
 
-    /** @var  array  $columns  columns to use */
+    /** @var array $columns  columns to use */
     public array $columns = [];
 
-    /** @var  bool  $columns  wether to use distinct */
+    /** @var bool $columns  Whether to use distinct */
     public bool $distinct = false;
 
     /**
      * Constructor
      *
-     * @param  array  $columns  an array of columns to select
+     * @param mixed|null $column
      */
-    public function __construct($column = null)
+    public function __construct(mixed $column = null)
     {
         $columns = func_get_args();
 
@@ -63,13 +63,12 @@ class Select extends Where
     }
 
     /**
-     * Set the table to select from
+     * Set the table to select from.
      *
-     * @param   string  $table  table to select from
-     * @param   ...
-     * @return  object  current instance
+     * @param mixed $table Table to select from.
+     * @param ...
      */
-    public function from($table)
+    public function from($table): static
     {
         $tables = func_get_args();
 
@@ -79,13 +78,12 @@ class Select extends Where
     }
 
     /**
-     * Sets/adds columns to select
+     * Sets/adds columns to select.
      *
-     * @param   mixed   column name or array($column, $alias) or object
-     * @param   ...
-     * @return  object  current instance
+     * @param mixed $column Column name or array($column, $alias) or object.
+     * @param ...
      */
-    public function select($column = null)
+    public function select(mixed $column = null): static
     {
         $this->columns = array_merge($this->columns, func_get_args());
 
@@ -93,11 +91,9 @@ class Select extends Where
     }
 
     /**
-     * Empty the select array
-     *
-     * @return  object  current instance
+     * Empty the select array.
      */
-    public function resetSelect()
+    public function resetSelect(): static
     {
         $this->columns = [];
 
@@ -107,10 +103,9 @@ class Select extends Where
     /**
      * Choose the columns to select from, using an array.
      *
-     * @param   array  $columns  list of column names or aliases
-     * @return  object current instance
+     * @param array $columns List of column names or aliases
      */
-    public function selectArray(array $columns = [])
+    public function selectArray(array $columns = []): static
     {
         ! empty($columns) && $this->columns = array_merge($this->columns, $columns);
 
@@ -118,12 +113,11 @@ class Select extends Where
     }
 
     /**
-     * Enables or disables selecting only unique (distinct) values
+     * Enables or disables selecting only unique (distinct) values.
      *
-     * @param   bool    $distinct  enable or disable distinct values
-     * @return  object  current instance
+     * @param bool $distinct Enable or disable distinct values.
      */
-    public function distinct($distinct = true)
+    public function distinct(bool $distinct = true): static
     {
         $this->distinct = $distinct;
 
@@ -133,11 +127,10 @@ class Select extends Where
     /**
      * Creates a "GROUP BY ..." filter.
      *
-     * @param   mixed   column name or array($column, $alias)
+     * @param mixed $columns Column name or array($column, $alias).
      * @param   ...
-     * @return  object  $this
      */
-    public function groupBy($columns)
+    public function groupBy(mixed $columns): static
     {
         $columns = func_get_args();
 
@@ -149,13 +142,12 @@ class Select extends Where
     /**
      * Adds a new join.
      *
-     * @param   string  $table  string column name or alias array
-     * @param   string  $type   join type
-     * @return  object  current instance
+     * @param string $table String column name or alias array.
+     * @param string|null $type Join type.
      */
-    public function join($table, $type = null)
+    public function join(string $table, ?string $type = null): static
     {
-        $this->join[] = $this->lastJoin = new Join($table, $type);
+        $this->join[] = $this->lastJoin = new Join(table: $table, type: $type);
 
         return $this;
     }
@@ -163,18 +155,18 @@ class Select extends Where
     /**
      * Sets an "AND ON" clause on the last join.
      *
-     * @param   string  $column1  column name
-     * @param   string  $op       logic operator
-     * @param   string  $column2  column name
-     * @return  object  current instance
+     * @param string $column1 column name
+     * @param string $op logic operator
+     * @param string|null $column2 column name
+     * @throws Exception
      */
-    public function on($column1, $op, $column2 = null)
+    public function on(string $column1, string $op, ?string $column2 = null): static
     {
         if (! $this->lastJoin) {
-            throw new Exception('You must first join a table before setting an "ON" clause.');
+            throw new Exception(message: 'You must first join a table before setting an "ON" clause.');
         }
 
-        call_user_func_array([$this->lastJoin, 'on'], func_get_args());
+        call_user_func_array(callback: [$this->lastJoin, 'on'], args: func_get_args());
 
         return $this;
     }
@@ -182,18 +174,18 @@ class Select extends Where
     /**
      * Sets an "AND ON" clause on the last join.
      *
-     * @param   string  $column1  column name
-     * @param   string  $op       logic operator
-     * @param   string  $column2  column name
-     * @return  object  current instance
+     * @param string $column1 column name
+     * @param string $op logic operator
+     * @param string|null $column2 column name
+     * @throws Exception
      */
-    public function andOn($column1, $op, $column2 = null)
+    public function andOn(string $column1, string $op, ?string $column2 = null): static
     {
         if (! $this->lastJoin) {
-            throw new Exception('You must first join a table before setting an "AND ON" clause.');
+            throw new Exception(message: 'You must first join a table before setting an "AND ON" clause.');
         }
 
-        call_user_func_array([$this->lastJoin, 'andOn'], func_get_args());
+        call_user_func_array(callback: [$this->lastJoin, 'andOn'], args: func_get_args());
 
         return $this;
     }
@@ -201,18 +193,18 @@ class Select extends Where
     /**
      * Sets an "OR ON" clause on the last join.
      *
-     * @param   string  $column1  column name
-     * @param   string  $op       logic operator
-     * @param   string  $column2  column name
-     * @return  object  current instance
+     * @param string $column1 column name
+     * @param string $op logic operator
+     * @param string|null $column2 column name
+     * @throws Exception
      */
-    public function orOn($column1, $op, $column2 = null)
+    public function orOn(string $column1, string $op, string $column2 = null): static
     {
         if (! $this->lastJoin) {
-            throw new Exception('You must first join a table before setting an "OR ON" clause.');
+            throw new Exception(message: 'You must first join a table before setting an "OR ON" clause.');
         }
 
-        call_user_func_array([$this->lastJoin, 'orOn'], func_get_args());
+        call_user_func_array(callback: [$this->lastJoin, 'orOn'], args: func_get_args());
 
         return $this;
     }
@@ -220,38 +212,36 @@ class Select extends Where
     /**
      * Alias for andHaving.
      *
-     * @param   mixed   $column  array of 'and having' statements or column name
-     * @param   string  $op      having logic operator
-     * @param   mixed   $value   having value
-     * @return  object  current instance
+     * @param mixed $column Array of 'and having' statements or column name.
+     * @param string|null $op Having logic operator.
+     * @param mixed $value Having value
+     * @return mixed
      */
-    public function having($column, $op = null, $value = null)
+    public function having(mixed $column, ?string $op = null, mixed $value = null): mixed
     {
-        return call_user_func_array([$this, 'andHaving'], func_get_args());
+        return call_user_func_array(callback: [$this, 'andHaving'], args: func_get_args());
     }
 
     /**
      * Alias for andNotHaving.
      *
-     * @param   mixed   $column  array of 'and not having' statements or column name
-     * @param   string  $op      having logic operator
-     * @param   mixed   $value   having value
-     * @return  object  current instance
+     * @param mixed $column Array of 'and not having' statements or column name.
+     * @param string|null $op Having logic operator.
+     * @param mixed|null $value Having value.
      */
-    public function notHaving($column, $op = null, $value = null)
+    public function notHaving(mixed $column, ?string $op = null, mixed $value = null): mixed
     {
-        return call_user_func_array([$this, 'andNotHaving'], func_get_args());
+        return call_user_func_array(callback: [$this, 'andNotHaving'], args: func_get_args());
     }
 
     /**
      * Adds an 'and having' statement to the query.
      *
-     * @param   mixed   $column  array of 'and having' statements or column name
-     * @param   string  $op      having logic operator
-     * @param   mixed   $value   having value
-     * @return  object  current instance
+     * @param   mixed   $column  Array of 'and having' statements or column name.
+     * @param string|null $op    Having logic operator.
+     * @param mixed|null $value  Having value.
      */
-    public function andHaving($column, $op = null, $value = null)
+    public function andHaving(mixed $column, ?string $op = null, mixed $value = null): static
     {
         if ($column instanceof Closure) {
             $this->andHavingOpen();
@@ -262,21 +252,20 @@ class Select extends Where
 
         if (func_num_args() === 2) {
             $value = $op;
-            $op = is_array($value) ? 'in' : '=';
+            $op = is_array(value: $value) ? 'in' : '=';
         }
 
-        return $this->having__('and', $column, $op, $value);
+        return $this->having__(type: 'and', column: $column, op: $op, value: $value);
     }
 
     /**
      * Adds an 'and not having' statement to the query.
      *
-     * @param   mixed   $column  array of 'and not having' statements or column name
-     * @param   string  $op      having logic operator
-     * @param   mixed   $value   having value
-     * @return  object  current instance
+     * @param mixed $column Array of 'and not having' statements or column name
+     * @param string|null $op Having logic operator.
+     * @param mixed|null $value Having value.
      */
-    public function andNotHaving($column, $op = null, $value = null)
+    public function andNotHaving(mixed $column, ?string $op = null, mixed $value = null): static
     {
         if ($column instanceof Closure) {
             $this->andNotHavingOpen();
@@ -287,21 +276,20 @@ class Select extends Where
 
         if (func_num_args() === 2) {
             $value = $op;
-            $op = is_array($value) ? 'in' : '=';
+            $op = is_array(value: $value) ? 'in' : '=';
         }
 
-        return $this->having__('and', $column, $op, $value, true);
+        return $this->having__(type: 'and', column: $column, op: $op, value: $value, not: true);
     }
 
     /**
      * Adds an 'or having' statement to the query.
      *
-     * @param   mixed   $column  array of 'or having' statements or column name
-     * @param   string  $op      having logic operator
-     * @param   mixed   $value   having value
-     * @return  object  current instance
+     * @param mixed $column Array of 'or having' statements or column name.
+     * @param string|null $op Having logic operator.
+     * @param mixed|null $value Having value.
      */
-    public function orHaving($column, $op = null, $value = null)
+    public function orHaving(mixed $column, ?string $op = null, mixed $value = null): static
     {
         if ($column instanceof Closure) {
             $this->orHavingOpen();
@@ -312,21 +300,20 @@ class Select extends Where
 
         if (func_num_args() === 2) {
             $value = $op;
-            $op = is_array($value) ? 'in' : '=';
+            $op = is_array(value: $value) ? 'in' : '=';
         }
 
-        return $this->having__('or', $column, $op, $value);
+        return $this->having__(type: 'or', column: $column, op: $op, value: $value);
     }
 
     /**
      * Adds an 'or having' statement to the query.
      *
-     * @param   mixed   $column  array of 'or having' statements or column name
-     * @param   string  $op      having logic operator
-     * @param   mixed   $value   having value
-     * @return  object  current instance
+     * @param mixed $column Array of 'or having' statements or column name.
+     * @param string|null $op Having logic operator.
+     * @param mixed|null $value Having value.
      */
-    public function orNotHaving($column, $op = null, $value = null)
+    public function orNotHaving(mixed $column, string $op = null, mixed $value = null): static
     {
         if ($column instanceof Closure) {
             $this->orNotHavingOpen();
@@ -340,15 +327,13 @@ class Select extends Where
             $op = '=';
         }
 
-        return $this->having__('or', $column, $op, $value, true);
+        return $this->having__(type: 'or', column: $column, op: $op, value: $value, not: true);
     }
 
     /**
      * Opens an 'and having' nesting.
-     *
-     * @return  object  current instance
      */
-    public function havingOpen()
+    public function havingOpen(): static
     {
         $this->having[] = [
             'type'    => 'and',
@@ -360,10 +345,8 @@ class Select extends Where
 
     /**
      * Opens an 'and having' nesting.
-     *
-     * @return  object  current instance
      */
-    public function notHavingOpen()
+    public function notHavingOpen(): static
     {
         $this->having[] = [
             'type'    => 'and',
@@ -376,10 +359,8 @@ class Select extends Where
 
     /**
      * Closes an 'and having' nesting.
-     *
-     * @return  object  current instance
      */
-    public function havingClose()
+    public function havingClose(): static
     {
         $this->having[] = [
             'nesting' => 'close',
@@ -390,20 +371,16 @@ class Select extends Where
 
     /**
      * Closes an 'and having' nesting.
-     *
-     * @return object Current instance.
      */
-    public function notHavingClose()
+    public function notHavingClose(): static
     {
         return $this->havingClose();
     }
 
     /**
      * Opens an 'and having' nesting.
-     *
-     * @return  object  current instance
      */
-    public function andHavingOpen()
+    public function andHavingOpen(): static
     {
         $this->having[] = [
             'type'    => 'and',
@@ -415,10 +392,8 @@ class Select extends Where
 
     /**
      * Opens an 'and having' nesting.
-     *
-     * @return  object  current instance
      */
-    public function andNotHavingOpen()
+    public function andNotHavingOpen(): static
     {
         $this->having[] = [
             'type'    => 'and',
@@ -431,30 +406,24 @@ class Select extends Where
 
     /**
      * Closes an 'and having' nesting.
-     *
-     * @return  object  current instance
      */
-    public function andHavingClose()
+    public function andHavingClose(): static
     {
         return $this->havingClose();
     }
 
     /**
      * Closes an 'and not having' nesting.
-     *
-     * @return  object  current instance
      */
-    public function andNotHavingClose()
+    public function andNotHavingClose(): static
     {
         return $this->havingClose();
     }
 
     /**
      * Opens an 'or having' nesting.
-     *
-     * @return  object  current instance
      */
-    public function orHavingOpen()
+    public function orHavingOpen(): static
     {
         $this->having[] = [
             'type'    => 'or',
@@ -466,10 +435,8 @@ class Select extends Where
 
     /**
      * Opens an 'or having' nesting.
-     *
-     * @return  object  current instance
      */
-    public function orNotHavingOpen()
+    public function orNotHavingOpen(): static
     {
         $this->having[] = [
             'type'    => 'or',
@@ -482,38 +449,33 @@ class Select extends Where
 
     /**
      * Closes an 'or having' nesting.
-     *
-     * @return  object  current instance
      */
-    public function orHavingClose()
+    public function orHavingClose(): static
     {
         return $this->havingClose();
     }
 
     /**
      * Closes an 'or having' nesting.
-     *
-     * @return  object  current instance
      */
-    public function orNotHavingClose()
+    public function orNotHavingClose(): static
     {
         return $this->havingClose();
     }
 
     /**
-     * Adds an 'and having' statement to the query
+     * Adds an 'and having' statement to the query.
      *
-     * @param   mixed    $column  array of 'and having' statements or column name
-     * @param   string   $op      having logic operator
-     * @param   mixed    $value   having value
-     * @param   boolean  $not     wether to use NOT
-     * @return  object  current instance
+     * @param mixed $column Array of 'and having' statements or column name.
+     * @param string $op Having logic operator.
+     * @param mixed $value Having value.
+     * @param bool $not Whether to use NOT.
      */
-    protected function having__($type, $column, $op, $value, $not = false)
+    protected function having__($type, mixed $column, string $op, mixed $value, bool $not = false): static
     {
-        if (is_array($column) && $op = null && $value = null) {
+        if (is_array(value: $column) && $op = null && $value = null) {
             foreach ($column as $key => $val) {
-                if (is_array($val)) {
+                if (is_array(value: $val)) {
                     $numArgs = count($val);
 
                     if ($numArgs === 2) {

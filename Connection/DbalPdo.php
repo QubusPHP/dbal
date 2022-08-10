@@ -21,12 +21,14 @@ use PDOStatement;
 use Qubus\Dbal\Base;
 use Qubus\Dbal\Connection;
 use Qubus\Dbal\DB;
+use Qubus\Dbal\DbalException;
 use Qubus\Dbal\DsnGenerator;
 use Qubus\Dbal\Expression;
 use Qubus\Dbal\Fnc;
 use Qubus\Dbal\Query;
 use Qubus\Dbal\ResultSet;
 use Qubus\Dbal\Schema;
+use Qubus\Dbal\Sql\Compiler;
 use Qubus\Exception\Exception;
 
 use function array_map;
@@ -47,6 +49,7 @@ use function is_object;
 use function is_string;
 use function microtime;
 use function preg_replace_callback;
+use function Qubus\Support\Helpers\is_null__;
 use function sprintf;
 use function strpos;
 use function strtolower;
@@ -59,19 +62,19 @@ use const PHP_OS;
 class DbalPdo extends Connection
 {
     /** @var  string  $tableQuote  table quote */
-    protected static $tableQuote = '`';
+    protected static string $tableQuote = '`';
 
     /** @var  string  $driver */
-    protected $driver;
+    protected string $driver;
 
-    /** @var  object  $connection  Dbal Compiler object */
-    protected $compiler;
+    /** @var  ?Compiler $compiler  Dbal Compiler object */
+    protected ?Compiler $compiler = null;
 
     /** @var  string  $insertIdField  field used for lastInsertId */
-    public $insertIdField;
+    public string $insertIdField;
 
     /** @var  string  $charset  connection charset */
-    public $charset;
+    public string $charset;
 
     /** @var  int  $savepoint  auto savepoint level */
     protected int $savepoint = 0;
@@ -79,8 +82,8 @@ class DbalPdo extends Connection
     /** @var array $config */
     protected array $config;
 
-    /** @var PDO pdoInstance */
-    private ?PDO $pdoInstance = null;
+    /** @var ?PDO pdoInstance */
+    protected ?PDO $pdoInstance = null;
 
     private ?string $pdoDriver = null;
 
@@ -89,7 +92,7 @@ class DbalPdo extends Connection
 
     protected ?Schema\Compiler $schemaCompiler = null;
 
-    /** @var Schema $chema Schema instance */
+    /** @var ?Schema $schema Schema instance */
     protected ?Schema $schema = null;
 
     /** @var array $compilerOptions Compiler options */
@@ -119,12 +122,12 @@ class DbalPdo extends Connection
         ], $config);
 
         // store the driver
-        $this->driver = strtolower($this->config['driver']);
+        $this->driver = strtolower(string: $this->config['driver']);
 
         // get connected
         $this->loadDatabase();
 
-        parent::__construct($this->config);
+        parent::__construct(config: $this->config);
     }
 
     private function buildDsn(): ?string
@@ -132,44 +135,28 @@ class DbalPdo extends Connection
         if (isset($this->config['dsn'])) {
             return $this->config['dsn'];
         }
+
         $this->dsn = null;
+
         $generator = new DsnGenerator();
-        switch ($this->pdoDriver) :
-            case 'sqlsrv':
-                $this->dsn = $generator->getSqlsrvDNS($this);
-        break;
 
-        case 'dblib':
-                $this->dsn = $generator->getDblibDNS($this);
-        break;
+        $this->dsn = match($this->pdoDriver) {
+            'sqlsrv' => $generator->getSqlsrvDNS($this),
+            'dblib' => $generator->getDblibDNS($this),
+            'sqlite' => $generator->getSqliteDNS($this),
+            'pgsql' => $generator->getPgsqlDNS($this),
+            'oci' => $generator->getOracleDNS($this),
+            'ibm' => $generator->getIbmDNS($this),
+            default => $generator->getMysqlDNS($this),
+        };
 
-        case 'sqlite':
-                $this->dsn = $generator->getSqliteDNS($this);
-        break;
-
-        case 'pgsql':
-                $this->dsn = $generator->getPgsqlDNS($this);
-        break;
-
-        case 'oci':
-                $this->dsn = $generator->getOracleDNS($this);
-        break;
-
-        case 'ibm':
-                $this->dsn = $generator->getIbmDNS($this);
-        break;
-
-        default:
-                $this->dsn = $generator->getMysqlDNS($this);
-        break;
-        endswitch;
         return $this->dsn;
     }
 
     /**
-     * @return mixed|PDO
+     * @return PDO|null
      */
-    private function loadDatabase()
+    private function loadDatabase(): ?PDO
     {
         if (! $this->pdoInstance) {
             try {
@@ -177,21 +164,21 @@ class DbalPdo extends Connection
                 $options = $this->resolveOptions();
                 if (
                     ! $this->pdoInstance = new PDO(
-                        $dsn,
-                        $this->config['username'],
-                        $this->config['password'],
-                        $options['attr']
+                        dsn: $dsn,
+                        username: $this->config['username'],
+                        password: $this->config['password'],
+                        options: $options['attr']
                     )
                 ) {
-                    throw new PDOException('Connection to the database could not be established');
+                    throw new DbalException(message: 'Connection to the database could not be established');
                 }
                 if (count($options['cmd']) > 0) {
                     foreach ($options['cmd'] as $cmd) {
-                        $this->pdoInstance->exec($cmd);
+                        $this->pdoInstance->exec(statement: $cmd);
                     }
                 }
             } catch (PDOException $e) {
-                trigger_error($e->getMessage(), E_USER_ERROR);
+                trigger_error(message: $e->getMessage(), error_level: E_USER_ERROR);
             }
         }
         return $this->pdoInstance;
@@ -200,7 +187,7 @@ class DbalPdo extends Connection
     /**
      * @return mixed
      */
-    private function resolveOptions()
+    private function resolveOptions(): mixed
     {
         $options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -210,8 +197,8 @@ class DbalPdo extends Connection
         ];
         $command = [];
         $params = $this->config;
-        if ($this->getName($params['driver']) === 'mysql') {
-            if (defined('PDO::MYSQL_ATTR_INIT_COMMAND')) {
+        if ($this->getName(driver: $params['driver']) === 'mysql') {
+            if (defined(constant_name: 'PDO::MYSQL_ATTR_INIT_COMMAND')) {
                 $options[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES ' . $params['charset'];
             }
 
@@ -232,11 +219,11 @@ class DbalPdo extends Connection
             $options[PDO::ATTR_EMULATE_PREPARES] = false;
         }
 
-        if (! isset($options[PDO::MYSQL_ATTR_INIT_COMMAND]) && ($this->getName($params['driver']) !== 'oci')) {
+        if (! isset($options[PDO::MYSQL_ATTR_INIT_COMMAND]) && ($this->getName(driver: $params['driver']) !== 'oci')) {
             $command[] = 'SET NAMES ' . $params['charset'];
         }
 
-        if ($this->getName($params['driver']) === 'sqlsrv') {
+        if ($this->getName(driver: $params['driver']) === 'sqlsrv') {
             $command[] = 'SET QUOTED_IDENTIFIER ON';
         }
 
@@ -246,41 +233,41 @@ class DbalPdo extends Connection
     /**
      * @return mixed
      */
-    public function serverVersion()
+    public function serverVersion(): mixed
     {
         if (! $this->pdoInstance instanceof PDO) {
             return false;
         }
-        return $this->pdoInstance->getAttribute(PDO::ATTR_SERVER_VERSION);
+        return $this->pdoInstance->getAttribute(attribute: PDO::ATTR_SERVER_VERSION);
     }
 
-    public function getName(string $driver)
+    public function getName(string $driver): string
     {
         if (! $driver) {
             $driver = 'mysql';
         }
-        $driver = strtolower($driver);
+        $driver = strtolower(string: $driver);
         switch ($driver) {
-            case strpos($driver, 'mssql'):
-            case strpos($driver, 'sqlserver'):
-            case strpos($driver, 'sqlsrv'):
-                $driver = strpos(PHP_OS, 'WIN') !== false ? 'sqlsrv' : 'dblib';
+            case strpos(haystack: $driver, needle: 'mssql'):
+            case strpos(haystack: $driver, needle: 'sqlserver'):
+            case strpos(haystack: $driver, needle: 'sqlsrv'):
+                $driver = strpos(haystack: PHP_OS, needle: 'WIN') !== false ? 'sqlsrv' : 'dblib';
                 break;
-            case strpos($driver, 'sybase'):
+            case strpos(haystack: $driver, needle: 'sybase'):
                 $driver = 'dblib';
                 break;
-            case strpos($driver, 'pgsql'):
+            case strpos(haystack: $driver, needle: 'pgsql'):
                 $driver = 'pgsql';
                 break;
-            case strpos($driver, 'sqlite'):
+            case strpos(haystack: $driver, needle: 'sqlite'):
                 $driver = 'sqlite';
                 break;
-            case strpos($driver, 'ibm'):
-            case strpos($driver, 'db2'):
-            case strpos($driver, 'odbc'):
+            case strpos(haystack: $driver, needle: 'ibm'):
+            case strpos(haystack: $driver, needle: 'db2'):
+            case strpos(haystack: $driver, needle: 'odbc'):
                 $driver = 'ibm';
                 break;
-            case strpos($driver, 'oracle'):
+            case strpos(haystack: $driver, needle: 'oracle'):
                 $driver = 'oci';
                 break;
             default:
@@ -294,14 +281,14 @@ class DbalPdo extends Connection
     {
         try {
             if (! $this->pdoInstance instanceof PDO) {
-                throw new Exception('No Connection has been established with the database.');
+                throw new Exception(message: 'No Connection has been established with the database.');
             }
 
             foreach ($this->commands as $command) {
-                $this->command($command['sql'], $command['params']);
+                $this->command(sql: $command['sql'], params: $command['params']);
             }
         } catch (Exception $a) {
-            trigger_error($a->getMessage(), E_USER_ERROR);
+            trigger_error(message: $a->getMessage(), error_level: E_USER_ERROR);
         }
         return $this->pdoInstance;
     }
@@ -313,32 +300,17 @@ class DbalPdo extends Connection
      */
     public function schemaCompiler(): Schema\Compiler
     {
-        if ($this->schemaCompiler === null) {
-            switch ($this->getDriver()) {
-                case 'mysql':
-                    $this->schemaCompiler = new Schema\Compiler\MySQL($this);
-                    break;
-                case 'pgsql':
-                    $this->schemaCompiler = new Schema\Compiler\PostgreSQL($this);
-                    break;
-                case 'dblib':
-                case 'mssql':
-                case 'sqlsrv':
-                case 'sybase':
-                    $this->schemaCompiler = new Schema\Compiler\SQLServer($this);
-                    break;
-                case 'sqlite':
-                    $this->schemaCompiler = new Schema\Compiler\SQLite($this);
-                    break;
-                case 'oci':
-                case 'oracle':
-                    $this->schemaCompiler = new Schema\Compiler\Oracle($this);
-                    break;
-                default:
-                    throw new Exception('Schema not supported yet');
-            }
+        if (is_null__($this->schemaCompiler)) {
+            $this->schemaCompiler = match($this->getDriver()) {
+                'mysql' => new Schema\Compiler\MySQL(connection: $this),
+                'pgsql' => new Schema\Compiler\PostgreSQL(connection: $this),
+                'dblib', 'mssql', 'sqlsrv', 'sybase' => new Schema\Compiler\SQLServer(connection: $this),
+                'sqlite' => new Schema\Compiler\SQLite(connection: $this),
+                'oci', 'oracle' => new Schema\Compiler\Oracle(connection: $this),
+                default => throw new Exception(message: 'Schema not supported yet.'),
+            };
 
-            $this->schemaCompiler->setOptions($this->schemaCompilerOptions);
+            $this->schemaCompiler->setOptions(options: $this->schemaCompilerOptions);
         }
 
         return $this->schemaCompiler;
@@ -369,7 +341,7 @@ class DbalPdo extends Connection
      * @param array $params (optional) Params
      * @return Connection
      */
-    public function initCommand(string $query, array $params = []): self
+    public function initCommand(string $query, array $params = []): Connection
     {
         $this->commands[] = [
             'sql'    => $query,
@@ -382,9 +354,9 @@ class DbalPdo extends Connection
     /**
      * Returns the DSN associated with this connection
      *
-     * @return string
+     * @return string|null
      */
-    public function getDsn()
+    public function getDsn(): ?string
     {
         return $this->dsn;
     }
@@ -392,12 +364,12 @@ class DbalPdo extends Connection
     /**
      * Returns the driver's name.
      *
-     * @return string
+     * @return string|null
      */
-    public function getDriver()
+    public function getDriver(): ?string
     {
-        if ($this->pdoDriver === null) {
-            $this->pdoDriver = $this->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
+        if (is_null__($this->pdoDriver)) {
+            $this->pdoDriver = $this->getPdo()->getAttribute(attribute: PDO::ATTR_DRIVER_NAME);
         }
 
         return $this->pdoDriver;
@@ -408,8 +380,8 @@ class DbalPdo extends Connection
      */
     public function getSchema(): Schema
     {
-        if ($this->schema === null) {
-            $this->schema = new Schema($this);
+        if (is_null__($this->schema)) {
+            $this->schema = new Schema(connection: $this);
         }
 
         return $this->schema;
@@ -418,40 +390,40 @@ class DbalPdo extends Connection
     /**
      * Execute a query
      *
-     * @param string $sql SQL Query
-     * @param array $params (optional) Query params
+     * @param string $sql SQL Query.
+     * @param array $params (optional) Query params.
      * @return ResultSet
      */
-    public function query(string $sql, array $params = [])
+    public function query(string $sql, array $params = []): ResultSet
     {
-        $prepared = $this->prepare($sql, $params);
-        $this->pdoExecute($prepared);
-        return new ResultSet($prepared['statement']);
+        $prepared = $this->prepare(query: $sql, params: $params);
+        $this->pdoExecute(prepared: $prepared);
+        return new ResultSet(statement: $prepared['statement']);
     }
 
     /**
-     * Execute a non-query SQL command
+     * Execute a non-query SQL command.
      *
-     * @param string $sql SQL Command
-     * @param array $params (optional) Command params
-     * @return mixed Command result
+     * @param string $sql SQL Command.
+     * @param array $params (optional) Command params.
+     * @return bool
      */
-    public function command(string $sql, array $params = [])
+    public function command(string $sql, array $params = []): bool
     {
-        return $this->pdoExecute($this->prepare($sql, $params));
+        return $this->pdoExecute(prepared: $this->prepare(query: $sql, params: $params));
     }
 
     /**
-     * Execute a query and return the number of affected rows
+     * Execute a query and return the number of affected rows.
      *
-     * @param string $sql SQL Query
-     * @param array $params (optional) Query params
+     * @param string $sql SQL Query.
+     * @param array $params (optional) Query params.
      * @return  int
      */
-    public function count(string $sql, array $params = [])
+    public function affectedRows(string $sql, array $params = []): int
     {
-        $prepared = $this->prepare($sql, $params);
-        $this->pdoExecute($prepared);
+        $prepared = $this->prepare(query: $sql, params: $params);
+        $this->pdoExecute(prepared: $prepared);
         $result = $prepared['statement']->rowCount();
         $prepared['statement']->closeCursor();
         return $result;
@@ -464,10 +436,10 @@ class DbalPdo extends Connection
      * @param   array $params (optional) Query params
      * @return  mixed
      */
-    public function column(string $sql, array $params = [])
+    public function column(string $sql, array $params = []): mixed
     {
-        $prepared = $this->prepare($sql, $params);
-        $this->pdoExecute($prepared);
+        $prepared = $this->prepare(query: $sql, params: $params);
+        $this->pdoExecute(prepared: $prepared);
         $result = $prepared['statement']->fetchColumn();
         $prepared['statement']->closeCursor();
         return $result;
@@ -481,20 +453,20 @@ class DbalPdo extends Connection
      */
     protected function replaceParams(string $query, array $params): string
     {
-        return preg_replace_callback('/\?/', function () use (&$params) {
+        return preg_replace_callback(pattern: '/\?/', callback: function () use (&$params) {
             $param = array_shift($params);
-            $param = is_object($param) ? get_class($param) : $param;
+            $param = is_object(value: $param) ? get_class(object: $param) : $param;
 
-            if (is_int($param) || is_float($param)) {
+            if (is_int(value: $param) || is_float(value: $param)) {
                 return $param;
-            } elseif ($param === null) {
+            } elseif (is_null__(var: $param)) {
                 return 'null';
-            } elseif (is_bool($param)) {
+            } elseif (is_bool(value: $param)) {
                 return $param ? 'true' : 'false';
             } else {
-                return $this->getPdo()->quote($param);
+                return $this->getPdo()->quote(string: $param);
             }
-        }, $query);
+        }, subject: $query);
     }
 
     /**
@@ -507,12 +479,12 @@ class DbalPdo extends Connection
     protected function prepare(string $query, array $params): array
     {
         try {
-            $statement = $this->getPdo()->prepare($query);
+            $statement = $this->getPdo()->prepare(query: $query);
         } catch (PDOException $e) {
-            throw new PDOException(
-                $e->getMessage() . ' [ ' . $this->replaceParams($query, $params) . ' ] ',
-                (int) $e->getCode(),
-                $e->getPrevious()
+            throw new DbalException(
+                message: $e->getMessage() . ' [ ' . $this->replaceParams(query: $query, params: $params) . ' ] ',
+                code: (int) $e->getCode(),
+                previous: $e->getPrevious()
             );
         }
 
@@ -520,6 +492,7 @@ class DbalPdo extends Connection
     }
 
     /**
+     * @param PDOStatement $statement
      * @param array $values
      */
     protected function bindValues(PDOStatement $statement, array $values)
@@ -527,34 +500,35 @@ class DbalPdo extends Connection
         foreach ($values as $key => $value) {
             $param = PDO::PARAM_STR;
 
-            if (null === $value) {
+            if (is_null__(var: $value)) {
                 $param = PDO::PARAM_NULL;
-            } elseif (is_int($value)) {
+            } elseif (is_int(value: $value)) {
                 $param = PDO::PARAM_INT;
-            } elseif (is_bool($value)) {
+            } elseif (is_bool(value: $value)) {
                 $param = PDO::PARAM_BOOL;
             }
 
-            $statement->bindValue($key + 1, $value, $param);
+            $statement->bindValue(param: $key + 1, value: $value, type: $param);
         }
     }
 
     /**
      * Quotes an identifier
      *
-     * @param   mixed   $value  value to quote
+     * @param mixed $value value to quote
      * @return  string  quoted identifier
+     * @throws Exception
      */
-    public function quoteIdentifier($value)
+    public function quoteIdentifier(mixed $value): mixed
     {
         if ($value === '*') {
             return $value;
         }
 
-        if (is_object($value)) {
+        if (is_object(value: $value)) {
             if ($value instanceof Base) {
                 // Create a sub-query
-                return '(' . $value->compile($this) . ')';
+                return '(' . $value->compile(connection: $this) . ')';
             } elseif ($value instanceof Expression) {
                 // Use a raw expression
                 return $value->handle($this->compiler);
@@ -562,29 +536,29 @@ class DbalPdo extends Connection
                 return $this->compiler->compilePartFnc($value);
             } else {
                 // Convert the object to a string
-                return $this->quoteIdentifier((string) $value);
+                return $this->quoteIdentifier(value: (string) $value);
             }
         }
 
-        if (is_array($value)) {
+        if (is_array(value: $value)) {
             // Separate the column and alias
             [$_value, $alias] = $value;
-            return $this->quoteIdentifier($_value) . ' AS ' . $this->quoteIdentifier($alias);
+            return $this->quoteIdentifier(value: $_value) . ' AS ' . $this->quoteIdentifier(value: $alias);
         }
 
-        if (strpos($value, '"') !== false) {
+        if (strpos(haystack: $value, needle: '"') !== false) {
             // Quote the column in FUNC("ident") identifiers
-            return preg_replace_callback('/"(.+?)"/', function ($matches) {
+            return preg_replace_callback(pattern: '/"(.+?)"/', callback: function ($matches) {
                 return $this->quoteIdentifier($matches[1]);
-            }, $value);
+            }, subject: $value);
         }
 
-        if (strpos($value, '.') !== false) {
+        if (strpos(haystack: $value, needle: '.') !== false) {
             // Split the identifier into the individual parts
-            $parts = explode('.', $value);
+            $parts = explode(separator: '.', string: $value);
 
             // Quote each of the parts
-            return implode('.', array_map([$this, __FUNCTION__], $parts));
+            return implode(separator: '.', array: array_map(callback: [$this, __FUNCTION__], array: $parts));
         }
 
         return static::$tableQuote . $value . static::$tableQuote;
@@ -596,31 +570,31 @@ class DbalPdo extends Connection
      * Objects passed to this function will be converted to strings.
      * Expression objects will use the value of the expression.
      * Query objects will be compiled and converted to a sub-query.
-     * Fnc objects will be send of for compiling.
+     * Fnc objects will be sent of for compiling.
      * All other objects will be converted using the `__toString` method.
      *
-     * @param array|string   any value to quote
-     * @return string
+     * @param float|array|bool|int|string|Base|Expression|Fnc|null $value any value to quote
+     * @return int|string
      */
-    public function quote($value)
+    public function quote(Expression|float|Base|array|bool|int|string|Fnc $value = null): int|string
     {
         try {
             if (! $this->pdoInstance instanceof PDO) {
-                throw new Exception('No PDOInstance has been made with the connection.');
+                throw new Exception(message: 'No PDOInstance has been made with the connection.');
             }
 
-            if ($value === null) {
+            if (is_null__(var: $value)) {
                 return 'NULL';
             }
 
-            if (is_bool($value)) {
+            if (is_bool(value: $value)) {
                 return $value ? 1 : 0;
             }
 
-            if (is_object($value)) {
+            if (is_object(value: $value)) {
                 if ($value instanceof Base) {
                     // create a sub-query
-                    return '(' . $value->compile($this) . ')';
+                    return '(' . $value->compile(connection: $this) . ')';
                 }
 
                 if ($value instanceof Fnc) {
@@ -633,57 +607,56 @@ class DbalPdo extends Connection
                     return $value->handle($this->compiler);
                 } else {
                     // Convert the object to a string
-                    return $this->quote((string) $value);
+                    return $this->quote(value: (string) $value);
                 }
             }
 
-            if (is_array($value)) {
-                return '(' . implode(', ', array_map([$this, 'quote'], $value)) . ')';
+            if (is_array(value: $value)) {
+                return '(' . implode(separator: ', ', array: array_map(callback: [$this, 'quote'], array: $value)) . ')';
             }
 
-            if (is_int($value)) {
+            if (is_int(value: $value)) {
                 return (int) $value;
             }
 
-            if (is_float($value)) {
+            if (is_float(value: $value)) {
                 // Convert to non-locale aware float to prevent possible commas
                 return sprintf('%F', $value);
             }
 
-            if (is_numeric($value) && ! is_string($value)) {
+            if (is_numeric(value: $value) && ! is_string(value: $value)) {
                 return (string) $value;
             }
         } catch (Exception $a) {
-            trigger_error($a->getMessage(), E_USER_ERROR);
+            trigger_error(message: $a->getMessage(), error_level: E_USER_ERROR);
         }
 
-        return $this->pdoInstance->quote($value);
+        return $this->pdoInstance->quote(string: $value);
     }
 
     /**
      * Sets the connection encoding.
      *
-     * @param  string  $charset  encoding
+     * @param string $charset Encoding.
      */
-    protected function setCharset($charset)
+    protected function setCharset(string $charset)
     {
         if (! empty($charset)) {
-            $this->pdoInstance->exec("SET NAMES {$this->quote($charset)}");
+            $this->pdoInstance->exec(statement: "SET NAMES {$this->quote(value: $charset)}");
         }
     }
 
     /**
      * Get the query compiler.
-     *
-     * @return  object  Dbal compiler object
+     * @throws Exception
      */
-    protected function getCompiler()
+    protected function getCompiler(): Compiler
     {
         if (! $this->compiler) {
-            $class = 'Qubus\\Dbal\\Sql\\Compiler\\' . ucfirst($this->driver);
+            $class = 'Qubus\\Dbal\\Sql\\Compiler\\' . ucfirst(string: $this->driver);
 
-            if (! class_exists($class)) {
-                throw new Exception('Cannot locate compiler for dialect: ' . $class);
+            if (! class_exists(class: $class)) {
+                throw new Exception(message: 'Cannot locate compiler for dialect: ' . $class);
             }
 
             $this->compiler = new $class($this);
@@ -696,20 +669,20 @@ class DbalPdo extends Connection
      * Executes a prepared query and returns true on success or false on failure.
      *
      * @param   array $prepared Prepared query
-     * @return  boolean
+     * @return  bool
      */
-    protected function pdoExecute(array $prepared)
+    protected function pdoExecute(array $prepared): bool
     {
         try {
             if ($prepared['params']) {
-                $this->bindValues($prepared['statement'], $prepared['params']);
+                $this->bindValues(statement: $prepared['statement'], values: $prepared['params']);
             }
             $result = $prepared['statement']->execute();
         } catch (PDOException $e) {
-            throw new PDOException($e->getMessage() . ' [ ' . $this->replaceParams(
-                $prepared['query'],
-                $prepared['params']
-            ) . ' ] ', (int) $e->getCode(), $e->getPrevious());
+            throw new DbalException(message: $e->getMessage() . ' [ ' . $this->replaceParams(
+                query: $prepared['query'],
+                params: $prepared['params']
+            ) . ' ] ', code: (int) $e->getCode(), previous: $e->getPrevious());
         }
 
         return $result;
@@ -718,23 +691,24 @@ class DbalPdo extends Connection
     /**
      * Executes a query on a connection
      *
-     * @param   object  $query     query object
-     * @param   string  $type      query type
-     * @param   array   $bindings  query bindings
-     * @return  mixed   query results
+     * @param mixed $query query object
+     * @param string|null $type query type
+     * @param array $bindings query bindings
+     * @return  array|bool|int   query results
+     * @throws Exception
      */
-    public function execute($query, $type = null, array $bindings = [])
+    public function execute(mixed $query, ?string $type = null, array $bindings = []): array|bool|int
     {
         if (! $query instanceof Base) {
-            $query = new Query($query, $type);
+            $query = new Query(query: $query, type: $type);
         }
 
         $type = $type ?: $query->getType();
-        $sql = $this->compile($query, $type, $bindings);
+        $sql = $this->compile(query: $query, type: $type, bindings: $bindings);
 
         $profilerData = [
             'query'  => $sql,
-            'start'  => microtime(true),
+            'start'  => microtime(as_float: true),
             'type'   => $type,
             'driver' => static::class . ':' . $this->driver,
         ];
@@ -743,11 +717,11 @@ class DbalPdo extends Connection
         $this->profilerCallbacks['start'] instanceof Closure && $this->profilerCallbacks['start']($profilerData);
 
         try {
-            $result = $this->pdoInstance->prepare($sql);
-            $result->execute($bindings);
+            $result = $this->pdoInstance->prepare(query: $sql);
+            $result->execute(params: $bindings);
         } catch (PDOException $e) {
-            $code = is_int($e->getCode()) ? $e->getCode() : 0;
-            throw new Exception($e->getMessage() . ' from QUERY: ' . $sql, $code);
+            $code = is_int(value: $e->getCode()) ? $e->getCode() : 0;
+            throw new DbalException(message: $e->getMessage() . ' from QUERY: ' . $sql, code: $code);
         }
 
         if ($type === DB::SELECT) {
@@ -756,7 +730,7 @@ class DbalPdo extends Connection
 
             if (! $asObject) {
                 $result = $result->fetchAll(PDO::FETCH_ASSOC);
-            } elseif (is_string($asObject)) {
+            } elseif (is_string(value: $asObject)) {
                 $propertiesLate = $query->getPropertiesLate();
                 $propertiesLate === null && $propertiesLate = $this->config['propertiesLate'];
 
@@ -774,14 +748,14 @@ class DbalPdo extends Connection
             }
         } elseif ($type === DB::INSERT) {
             $result = [
-                $this->pdoInstance->lastInsertId($query->insertIdField() ?: $this->insertIdField),
+                $this->pdoInstance->lastInsertId(name: $query->insertIdField() ?: $this->insertIdField),
                 $result->rowCount(),
             ];
         } else {
             $result = $result->errorCode() === '00000' ? $result->rowCount() : -1;
         }
 
-        $profilerData['end'] = microtime(true);
+        $profilerData['end'] = microtime(as_float: true);
         $profilerData['duration'] = $profilerData['end'] - $profilerData['start'];
 
         // clear out any previous queries when profiling is turned off.
@@ -802,32 +776,33 @@ class DbalPdo extends Connection
     /**
      * Compile the query.
      *
-     * @param   object  $query     query object
-     * @param   string  $type      query type
-     * @param   array   $bindings  query bindings
+     * @param mixed $query query object
+     * @param string|null $type query type
+     * @param array $bindings query bindings
+     * @return string
+     * @throws Exception
      */
-    public function compile($query, ?string $type = null, array $bindings = [])
+    public function compile(mixed $query, ?string $type = null, array $bindings = []): string
     {
         if (! $query instanceof Base) {
-            $query = new Query($query, $type);
+            $query = new Query(query: $query, type: $type);
         }
 
         // Re-retrieve the query type
         $type = $query->getType();
 
-        return $this->getCompiler()->compile($query, $type, $bindings);
+        return $this->getCompiler()->compile(query: $query, type: $type, bindings: $bindings);
     }
 
     /**
      * Sets transaction savepoint.
      *
-     * @param   string  $savepoint  savepoint name
-     * @return  object  $this
+     * @param mixed $savepoint Savepoint name.
      */
-    public function setSavepoint($savepoint = null)
+    public function setSavepoint(mixed $savepoint = null): static
     {
         $savepoint || $savepoint = 'DBAL_SP_LEVEL_' . ++$this->savepoint;
-        $this->pdoInstance->query('SAVEPOINT ' . $savepoint);
+        $this->pdoInstance->query(statement: 'SAVEPOINT ' . $savepoint);
 
         return $this;
     }
@@ -835,17 +810,17 @@ class DbalPdo extends Connection
     /**
      * Roll back to a transaction savepoint.
      *
-     * @param   string  $savepoint  savepoint name
-     * @return  object  $this
+     * @param mixed $savepoint Savepoint name.
+     * @return DbalPdo
      */
-    public function rollbackSavepoint($savepoint = null)
+    public function rollbackSavepoint(mixed $savepoint = null): static
     {
         if (! $savepoint) {
             $savepoint = 'DBAL_SP_LEVEL_' . $this->savepoint;
             $this->savepoint--;
         }
 
-        $this->pdoInstance->query('ROLLBACK TO SAVEPOINT ' . $savepoint);
+        $this->pdoInstance->query(statement: 'ROLLBACK TO SAVEPOINT ' . $savepoint);
 
         return $this;
     }
@@ -853,10 +828,9 @@ class DbalPdo extends Connection
     /**
      * Release a transaction savepoint.
      *
-     * @param   string  $savepoint  savepoint name
-     * @return  object  $this
+     * @param mixed $savepoint Savepoint name.
      */
-    public function releaseSavepoint($savepoint = null)
+    public function releaseSavepoint(mixed $savepoint = null): static
     {
         if (! $savepoint) {
             $savepoint = 'DBAL_SP_LEVEL_' . $this->savepoint;
