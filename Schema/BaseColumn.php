@@ -76,10 +76,11 @@ class BaseColumn
     }
 
     /**
-     * @param $value
+     * @param string $name
+     * @param mixed $value
      * @return $this
      */
-    public function set(string $name, $value): self
+    public function set(string $name, mixed $value): self
     {
         $this->properties[$name] = $value;
         return $this;
@@ -94,7 +95,7 @@ class BaseColumn
      * @param mixed|null $default
      * @return mixed|null
      */
-    public function get(string $name, $default = null)
+    public function get(string $name, mixed $default = null): mixed
     {
         return $this->properties[$name] ?? $default;
     }
@@ -104,13 +105,13 @@ class BaseColumn
      */
     public function size(string $value): self
     {
-        $value = strtolower($value);
+        $value = strtolower(string: $value);
 
-        if (! in_array($value, ['tiny', 'small', 'normal', 'medium', 'big'])) {
+        if (! in_array(needle: $value, haystack: ['tiny', 'small', 'normal', 'medium', 'big'])) {
             return $this;
         }
 
-        return $this->set('size', $value);
+        return $this->set(name: 'size', value: $value);
     }
 
     /**
@@ -118,7 +119,7 @@ class BaseColumn
      */
     public function notNull(): self
     {
-        return $this->set('nullable', false);
+        return $this->set(name: 'nullable', value: false);
     }
 
     /**
@@ -126,7 +127,7 @@ class BaseColumn
      */
     public function description(string $comment): self
     {
-        return $this->set('description', $comment);
+        return $this->set(name: 'description', value: $comment);
     }
 
     /**
@@ -135,7 +136,7 @@ class BaseColumn
      */
     public function defaultValue($value): self
     {
-        return $this->set('default', $value);
+        return $this->set(name: 'default', value: $value);
     }
 
     /**
@@ -143,15 +144,15 @@ class BaseColumn
      */
     public function unsigned(bool $value = true): self
     {
-        return $this->set('unsigned', $value);
+        return $this->set(name: 'unsigned', value: $value);
     }
 
     /**
-     * @param $value
+     * @param mixed $value
      * @return $this
      */
-    public function length($value): self
+    public function length(mixed $value): self
     {
-        return $this->set('length', $value);
+        return $this->set(name: 'length', value: $value);
     }
 }

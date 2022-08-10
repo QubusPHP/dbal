@@ -17,12 +17,12 @@ namespace Qubus\Dbal;
 class Expression
 {
     /** @var  mixed  $value  the raw expression */
-    protected $value;
+    protected mixed $value;
 
     /**
-     * @param  mixed  expression value
+     * @param mixed $value expression value
      */
-    public function __construct($value)
+    public function __construct(mixed $value)
     {
         $this->value = $value;
     }
@@ -34,7 +34,7 @@ class Expression
      *
      * @return  string
      */
-    public function value()
+    public function value(): string
     {
         return (string) $this->value;
     }
@@ -42,10 +42,10 @@ class Expression
     /**
      * Returns the expression value.
      *
-     * @param   object Compiler.
+     * @param mixed ...$arg Compiler.
      * @return  mixed  The expression value
      */
-    public function handle(...$arg)
+    public function handle(mixed $arg): mixed
     {
         return $this->value;
     }

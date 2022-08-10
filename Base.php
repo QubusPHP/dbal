@@ -20,8 +20,8 @@ use function is_array;
 
 abstract class Base
 {
-    /** @var mixed  $asOjbect  true for stCLass or string classname */
-    protected $asObject;
+    /** @var bool|string|null $asOjbect True for stCLass or string classname. */
+    protected bool|string|null $asObject;
 
     /** @var bool $propertiesLate  true for assigning properties after object creation */
     protected bool $propertiesLate;
@@ -33,20 +33,20 @@ abstract class Base
     protected array $bindings = [];
 
     /** @var  string  $type  query type */
-    protected $type;
+    protected string $type;
 
-    /** @var  object  $connection  connection object */
+    /** @var  Connection $connection  connection object */
     protected Connection $connection;
 
     /**
      * Bind a value to the query.
      *
-     * @param   mixed  $key    binding key or associative array of bindings
-     * @param   mixed  $value  binding value
+     * @param mixed $key Binding key or associative array of bindings.
+     * @param mixed|null $value Binding value.
      */
-    public function bind($key, $value = null)
+    public function bind(mixed $key, mixed $value = null): static
     {
-        is_array($key) || $key = [$key => $value];
+        is_array(value: $key) || $key = [$key => $value];
 
         foreach ($key as $k => $v) {
             $this->bindings[$k] = $v;
@@ -58,13 +58,13 @@ abstract class Base
     /**
      * Get the query value.
      *
-     * @param object $connection Database connection object
-     * @return object $this
+     * @param Connection $connection Database connection object
+     * @throws Exception
      */
-    public function setConnection(Connection $connection)
+    public function setConnection(Connection $connection): static
     {
         if (! $connection instanceof Connection) {
-            throw new Exception('Supplied invalid connection object.');
+            throw new Exception(message: 'Supplied invalid connection object.');
         }
 
         $this->connection = $connection;
@@ -74,9 +74,6 @@ abstract class Base
 
     /**
      * Get the connection object.
-     *
-     * @return object Connection object.
-     * @throws Exception When no connection object is set.
      */
     public function getConnection(): ?Connection
     {
@@ -88,7 +85,7 @@ abstract class Base
      *
      * @return mixed Query contents.
      */
-    abstract public function getContents();
+    abstract public function getContents(): mixed;
 
     /**
      * Returns the query's bindings.
@@ -103,9 +100,9 @@ abstract class Base
     /**
      * Returns the query type.
      *
-     * @return array Query bindings.
+     * @return string Query bindings.
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -113,12 +110,11 @@ abstract class Base
     /**
      * Set the return type for SELECT statements
      *
-     * @param mixed $object               For connection default, false for array, true for stdClass or string classname.
-     * @param bool  $propertiesLate       Accessing properties late.
+     * @param bool|string|null $object Null for connection default, false for array, true for stdClass or string classname.
+     * @param bool $propertiesLate Accessing properties late.
      * @param array $constructorArguments Constructor arguments.
-     * @return object $this;
      */
-    public function asObject($object = true, $propertiesLate = false, array $constructorArguments = [])
+    public function asObject(bool|string|null $object = true, bool $propertiesLate = false, array $constructorArguments = []): static
     {
         $this->asObject = $object;
         $this->propertiesLate = $propertiesLate;
@@ -130,12 +126,11 @@ abstract class Base
     /**
      * When return type is classname you can assign properties late
      *
-     * @param bool  $propertieslate false, true to assign properties late
-     * @return object  $this;
+     * @param bool $propertiesLate false, true to assign properties late
      */
-    public function setPropertiesLate($propertieslate = false)
+    public function setPropertiesLate(bool $propertiesLate = false): static
     {
-        $this->propertiesLate = $propertieslate;
+        $this->propertiesLate = $propertiesLate;
 
         return $this;
     }
@@ -152,9 +147,9 @@ abstract class Base
      * ConstructorArguments set constructor arguments
      *
      * @param array $constructorArguments
-     * @return object $this;
+     * @return Base
      */
-    public function setConstructorArguments(array $constructorArguments = [])
+    public function setConstructorArguments(array $constructorArguments = []): static
     {
         $this->constructorArguments = $constructorArguments;
         return $this;
@@ -172,10 +167,8 @@ abstract class Base
 
     /**
      * Sets the return type to array
-     *
-     * @return  object  $this;
      */
-    public function asAssoc()
+    public function asAssoc(): static
     {
         $this->asObject = false;
 
@@ -183,11 +176,11 @@ abstract class Base
     }
 
     /**
-     * Returns wether to get as array or object
+     * Returns whether to get as array or object
      *
-     * @return  mixed  null for array, true for stdClass or string for classname
+     * @return  string|bool|null  null for array, true for stdClass or string for classname
      */
-    public function getAsObject()
+    public function getAsObject(): string|bool|null
     {
         return $this->asObject;
     }
@@ -195,32 +188,34 @@ abstract class Base
     /**
      * Executes the query on a given connection.
      *
-     * @param   object  $connection  Qubus\Dbal\Connection
-     * @return  mixed   Query result.
+     * @param Connection|null $connection Qubus\Dbal\Connection
+     * @return int|bool|array Query result.
+     * @throws Exception
      */
-    public function execute($connection = null)
+    public function execute(Connection $connection = null): int|bool|array
     {
         $connection || $connection = $this->getConnection();
 
         if (! $connection) {
-            throw new Exception('Cannot execute a query without a valid connection');
+            throw new Exception(message: 'Cannot execute a query without a valid connection');
         }
 
-        return $connection->execute($this);
+        return $connection->execute(query: $this);
     }
 
     /**
      * Compiles the query on a given connection.
      *
-     * @param   object  $connection  Qubus\Dbal\Connection
-     * @return  mixed   compiled query
+     * @param Connection|null $connection Qubus\Dbal\Connection
+     * @return string compiled query.
+     * @throws Exception
      */
-    public function compile($connection = null)
+    public function compile(Connection $connection = null): string
     {
         $connection || $connection = $this->getConnection();
 
         if (! $connection) {
-            throw new Exception('Cannot compile a query without a valid connection');
+            throw new Exception(message: 'Cannot compile a query without a valid connection');
         }
 
         return $connection->compile($this, $this->getType());

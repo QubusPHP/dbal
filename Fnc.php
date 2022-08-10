@@ -21,7 +21,7 @@ class Fnc
     /** @var array  $params  function params */
     protected array $params = [];
 
-    /** @var string  $fnc  function name */
+    /** @var string|null $fnc  function name */
     protected ?string $fnc = null;
 
     /** @var  string  $quoteAs  quote as value or as identifier */
@@ -30,10 +30,10 @@ class Fnc
     /**
      * Constructor, stores function name and ensures $params is an array.
      *
-     * @param  string  $fnc      function name
-     * @param  mixed   $params  function params
+     * @param string|null $fnc function name
+     * @param mixed $params function params
      */
-    public function __construct(?string $fnc, $params = [])
+    public function __construct(?string $fnc, mixed $params = [])
     {
         is_array($params) || $params = [$params];
 
@@ -43,10 +43,8 @@ class Fnc
 
     /**
      * Sets the default quote type to value.
-     *
-     * @return  object  $this
      */
-    public function quoteAsValue()
+    public function quoteAsValue(): static
     {
         $this->quoteAs = 'value';
 
@@ -55,10 +53,8 @@ class Fnc
 
     /**
      * Sets the default quote type to identifier.
-     *
-     * @return  object  $this
      */
-    public function quoteAsIdentifier()
+    public function quoteAsIdentifier(): static
     {
         $this->quoteAs = 'identifier';
 
@@ -70,7 +66,7 @@ class Fnc
      *
      * @return  string  quoteation type
      */
-    public function quoteAs()
+    public function quoteAs(): string
     {
         return $this->quoteAs;
     }
@@ -78,9 +74,9 @@ class Fnc
     /**
      * Retrieve the function name.
      *
-     * @return  string  function name
+     * @return string|null function name
      */
-    public function getFnc()
+    public function getFnc(): ?string
     {
         return $this->fnc;
     }
@@ -90,7 +86,7 @@ class Fnc
      *
      * @return  array  function params
      */
-    public function getParams()
+    public function getParams(): array
     {
         return $this->params;
     }
@@ -98,10 +94,10 @@ class Fnc
     /**
      * Wrap the function in an alias.
      *
-     * @param   string  alias identifier
+     * @param string $name alias identifier
      * @return  array   alias array
      */
-    public function aliasTo($name)
+    public function aliasTo(string $name): array
     {
         return [$this, $name];
     }

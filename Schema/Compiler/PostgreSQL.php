@@ -38,85 +38,56 @@ use Qubus\Dbal\Schema\CreateTable;
 class PostgreSQL extends Compiler
 {
     /** @var string[] $modifiers */
-    protected $modifiers = ['nullable', 'default'];
+    protected array $modifiers = ['nullable', 'default'];
 
-    /**
-     * @inheritDoc
-     */
     protected function handleTypeInteger(BaseColumn $column): string
     {
-        $autoincrement = $column->get('autoincrement', false);
+        $autoincrement = $column->get(name: 'autoincrement', default: false);
 
-        switch ($column->get('size', 'normal')) {
-            case 'tiny':
-            case 'small':
-                return $autoincrement ? 'SMALLSERIAL' : 'SMALLINT';
-            case 'medium':
-                return $autoincrement ? 'SERIAL' : 'INTEGER';
-            case 'big':
-                return $autoincrement ? 'BIGSERIAL' : 'BIGINT';
-        }
-
-        return $autoincrement ? 'SERIAL' : 'INTEGER';
+        return match($column->get(name: 'size', default: 'normal')) {
+            'tiny', 'small' => $autoincrement ? 'SMALLSERIAL' : 'SMALLINT',
+            'medium' => $autoincrement ? 'SERIAL' : 'INTEGER',
+            'big' => $autoincrement ? 'BIGSERIAL' : 'BIGINT',
+            default => $autoincrement ? 'SERIAL' : 'INTEGER',
+        };
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function handleTypeFloat(BaseColumn $column): string
     {
         return 'REAL';
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function handleTypeDouble(BaseColumn $column): string
     {
         return 'DOUBLE PRECISION';
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function handleTypeDecimal(BaseColumn $column): string
     {
-        if (null !== $l = $column->get('length')) {
-            if (null === $p = $column->get('precision')) {
-                return 'DECIMAL (' . $this->value($l) . ')';
+        if (null !== $l = $column->get(name: 'length')) {
+            if (null === $p = $column->get(name: 'precision')) {
+                return 'DECIMAL (' . $this->value(value: $l) . ')';
             }
-            return 'DECIMAL (' . $this->value($l) . ', ' . $this->value($p) . ')';
+            return 'DECIMAL (' . $this->value(value: $l) . ', ' . $this->value(value: $p) . ')';
         }
         return 'DECIMAL';
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function handleTypeBinary(BaseColumn $column): string
     {
         return 'BYTEA';
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function handleTypeTime(BaseColumn $column): string
     {
         return 'TIME(0) WITHOUT TIME ZONE';
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function handleTypeTimestamp(BaseColumn $column): string
     {
         return 'TIMESTAMP(0) WITHOUT TIME ZONE';
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function handleTypeDateTime(BaseColumn $column): string
     {
         return 'TIMESTAMP(0) WITHOUT TIME ZONE';
@@ -138,7 +109,7 @@ class PostgreSQL extends Compiler
         $table = $schema->getTableName();
 
         foreach ($indexes as $name => $columns) {
-            $sql[] = 'CREATE INDEX ' . $this->wrap($table . '_' . $name) . ' ON ' . $this->wrap($table) . '(' . $this->wrapArray($columns) . ')';
+            $sql[] = 'CREATE INDEX ' . $this->wrap(name: $table . '_' . $name) . ' ON ' . $this->wrap(name: $table) . '(' . $this->wrapArray(value: $columns) . ')';
         }
 
         return $sql;
@@ -151,8 +122,8 @@ class PostgreSQL extends Compiler
     {
         /** @var BaseColumn $column */
         $column = $data['column'];
-        return 'ALTER TABLE ' . $this->wrap($table->getTableName()) . ' RENAME COLUMN '
-        . $this->wrap($data['from']) . ' TO ' . $this->wrap($column->getName());
+        return 'ALTER TABLE ' . $this->wrap(name: $table->getTableName()) . ' RENAME COLUMN '
+        . $this->wrap(name: $data['from']) . ' TO ' . $this->wrap(name: $column->getName());
     }
 
     /**
@@ -160,7 +131,7 @@ class PostgreSQL extends Compiler
      */
     protected function handleAddIndex(AlterTable $table, $data): string
     {
-        return 'CREATE INDEX ' . $this->wrap($table->getTableName() . '_' . $data['name']) . ' ON ' . $this->wrap($table->getTableName()) . ' (' . $this->wrapArray($data['columns']) . ')';
+        return 'CREATE INDEX ' . $this->wrap(name: $table->getTableName() . '_' . $data['name']) . ' ON ' . $this->wrap(name: $table->getTableName()) . ' (' . $this->wrapArray(value: $data['columns']) . ')';
     }
 
     /**
@@ -168,7 +139,7 @@ class PostgreSQL extends Compiler
      */
     protected function handleDropIndex(AlterTable $table, $data): string
     {
-        return 'DROP INDEX ' . $this->wrap($table->getTableName() . '_' . $data);
+        return 'DROP INDEX ' . $this->wrap(name: $table->getTableName() . '_' . $data);
     }
 
     /**
@@ -184,11 +155,11 @@ class PostgreSQL extends Compiler
      */
     public function getColumns(string $database, string $table): array
     {
-        $sql = 'SELECT ' . $this->wrap('column_name') . ' AS ' . $this->wrap('name')
-        . ', ' . $this->wrap('udt_name') . ' AS ' . $this->wrap('type')
-        . ' FROM ' . $this->wrap('information_schema') . '.' . $this->wrap('columns')
-        . ' WHERE ' . $this->wrap('table_schema') . ' = ? AND ' . $this->wrap('table_name') . ' = ? '
-        . ' ORDER BY ' . $this->wrap('ordinal_position') . ' ASC';
+        $sql = 'SELECT ' . $this->wrap(name: 'column_name') . ' AS ' . $this->wrap(name: 'name')
+        . ', ' . $this->wrap(name: 'udt_name') . ' AS ' . $this->wrap(name: 'type')
+        . ' FROM ' . $this->wrap(name: 'information_schema') . '.' . $this->wrap(name: 'columns')
+        . ' WHERE ' . $this->wrap(name: 'table_schema') . ' = ? AND ' . $this->wrap(name: 'table_name') . ' = ? '
+        . ' ORDER BY ' . $this->wrap(name: 'ordinal_position') . ' ASC';
 
         return [
             'sql'    => $sql,
@@ -213,7 +184,7 @@ class PostgreSQL extends Compiler
     public function renameTable(string $current, string $new): array
     {
         return [
-            'sql'    => 'ALTER TABLE ' . $this->wrap($current) . ' RENAME TO ' . $this->wrap($new),
+            'sql'    => 'ALTER TABLE ' . $this->wrap(name: $current) . ' RENAME TO ' . $this->wrap(name: $new),
             'params' => [],
         ];
     }

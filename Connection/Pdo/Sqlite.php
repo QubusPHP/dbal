@@ -27,40 +27,40 @@ class Sqlite extends DbalPdo
     /**
      * Sets the connection encoding.
      *
-     * @param  string  $charset  encoding
+     * @param string $charset  encoding
      */
-    public function setCharset($charset)
+    public function setCharset(string $charset)
     {
         if ($charset) {
-            $this->connection->exec('PRAGMA encoding = ' . $this->quote($charset));
+            $this->pdoInstance->exec(statement: 'PRAGMA encoding = ' . $this->quote(value: $charset));
         }
     }
 
-    public function listTables()
+    public function listTables(): array
     {
-        return array_map(function ($i) {
+        return array_map(callback: function ($i) {
             return reset($i);
-        }, $this->query("SELECT name FROM sqlite_master WHERE type = 'table'"
+        }, array: DB::query(query: "SELECT name FROM sqlite_master WHERE type = 'table'"
             . " AND name != 'sqlite_sequence' AND name != 'geometry_columns'"
             . " AND name != 'spatial_ref_sys' "
             . "UNION ALL SELECT name FROM sqlite_temp_master "
-            . "WHERE type = 'table' ORDER BY name", DB::SELECT)
+            . "WHERE type = 'table' ORDER BY name", type:  DB::SELECT)
             ->asAssoc()
             ->execute());
     }
 
-    public function listFields($table)
+    public function listFields(mixed $table): array
     {
-        return array_map(function ($i) {
+        return array_map(callback: function ($i) {
             $field = [
                 'name' => $i['name'],
             ];
 
             $type = $i['type'];
 
-            if ($pos = strpos($type, '(')) {
-                $field['type'] = substr($type, 0, $pos);
-                $field['constraint'] = substr($type, $pos + 1, -1);
+            if ($pos = strpos(haystack: $type, needle: '(')) {
+                $field['type'] = substr(string: $type, offset: 0, length: $pos);
+                $field['constraint'] = substr(string: $type, offset: $pos + 1, length: -1);
             } else {
                 $field['constraint'] = null;
             }
@@ -70,28 +70,28 @@ class Sqlite extends DbalPdo
             $field['primary'] = (bool) $i['pk'];
 
             return $field;
-        }, $this->query('Pragma table_info(' . $this->quoteIdentifier($table) . ')', DB::SELECT)
+        }, array: DB::query(query: 'Pragma table_info(' . $this->quoteIdentifier(value: $table) . ')', type: DB::SELECT)
             ->asAssoc()
             ->execute());
     }
 
-    public function startTransaction()
+    public function startTransaction(): static
     {
-        $this->pdoInstance->query('BEGIN');
+        $this->pdoInstance->query(statement: 'BEGIN');
 
         return $this;
     }
 
-    public function commitTransaction()
+    public function commitTransaction(): static
     {
-        $this->pdoInstance->query('COMMIT');
+        $this->pdoInstance->query(statement: 'COMMIT');
 
         return $this;
     }
 
-    public function rollbackTransaction()
+    public function rollbackTransaction(): static
     {
-        $this->pdoInstance->query('ROLLBACK');
+        $this->pdoInstance->query(statement: 'ROLLBACK');
 
         return $this;
     }

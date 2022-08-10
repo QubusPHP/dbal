@@ -18,7 +18,10 @@ use Qubus\Dbal\Collector\Delete;
 use Qubus\Dbal\Collector\Insert;
 use Qubus\Dbal\Collector\Select;
 use Qubus\Dbal\Collector\Update;
+use Qubus\Exception\Exception;
 use Qubus\ValueObjects\DateTime\DateTime;
+
+use Qubus\ValueObjects\DateTime\Exception\InvalidDateException;
 
 use function func_get_args;
 
@@ -32,7 +35,7 @@ use function func_get_args;
 class DB
 {
     /**
-     * Query type contants.
+     * Query type constants.
      */
     public const PLAIN                 = 'Plain';
     public const INSERT                = 'Insert';
@@ -40,15 +43,15 @@ class DB
     public const UPDATE                = 'Update';
     public const DELETE                = 'Delete';
 
-    protected static $connection;
+    protected static Connection $connection;
 
     /**
      * Retrieve a database connection.
      *
-     * @param   array   $config  database connection config
-     * @return  object  a new Qubus\Dbal\Cconnection\[type] object
+     * @param array $config database connection config
+     * @throws Exception
      */
-    public static function connection($config = [])
+    public static function connection(array $config = []): Connection
     {
         return self::$connection = Connection::instance($config);
     }
@@ -56,10 +59,10 @@ class DB
     /**
      * Database expression shortcut.
      *
-     * @param   mixed  $expression
-     * @return  object  a new Qubus\Dbal\Expression object.
+     * @param mixed $expression
+     * @return Expression
      */
-    public static function expr($expression): Expression
+    public static function expr(mixed $expression): Expression
     {
         return new Expression($expression);
     }
@@ -68,9 +71,8 @@ class DB
      * Database value shortcut.
      *
      * @param   mixed   $value  value
-     * @return  object  a new Qubus\Dbal\Value object.
      */
-    public static function value($value)
+    public static function value(mixed $value): Value
     {
         return new Value($value);
     }
@@ -79,9 +81,8 @@ class DB
      * Database identifier shortcut.
      *
      * @param   mixed   $identifier  identifier
-     * @return  object  a new Qubus\Dbal\Value object.
      */
-    public static function identifier($identifier): Identifier
+    public static function identifier(mixed $identifier): Identifier
     {
         return new Identifier($identifier);
     }
@@ -89,13 +90,13 @@ class DB
     /**
      * Database function shortcut.
      *
-     * @param   string  $fnc      function
-     * @param   array   $params  function params
-     * @return  object  a new Qubus\Dbal\Fnc object.
+     * @param string|null $fnc function
+     * @param mixed $params function params
+     * @return Fnc
      */
-    public static function fnc(?string $fnc, $params = []): Fnc
+    public static function fnc(?string $fnc, mixed $params = []): Fnc
     {
-        return new Fnc($fnc, $params);
+        return new Fnc(fnc: $fnc, params: $params);
     }
 
     /**
@@ -104,9 +105,8 @@ class DB
      * @param   mixed   $query     raw database query
      * @param   string  $type      query type
      * @param   array   $bindings  query bindings
-     * @return  object  Qubus\Dbal\Query
      */
-    public static function query($query, $type, array $bindings = []): Query
+    public static function query(mixed $query, string $type, array $bindings = []): Query
     {
         return new Query($query, $type, $bindings);
     }
@@ -114,10 +114,9 @@ class DB
     /**
      * Create a select collector object.
      *
-     * @param mixed  String field names or arrays for alias
-     * @return object Select query collector object.
+     * @param mixed $column String field names or arrays for alias
      */
-    public static function select($column = null): Select
+    public static function select(mixed $column = null): Select
     {
         $query = new Select();
         return $query->selectArray(func_get_args());
@@ -126,10 +125,9 @@ class DB
     /**
      * Creates a select collector object.->select('user_login', 'user_fname')
      *
-     * @param   array   $columns  array of fields to select
-     * @return  object  select query collector object
+     * @param array $columns  array of fields to select
      */
-    public static function selectArray($columns = [])
+    public static function selectArray(array $columns = []): Select
     {
         return static::select()->selectArray($columns);
     }
@@ -139,9 +137,8 @@ class DB
      *
      * @param string   $table  table to update
      * @param array    $set    associative array of new values
-     * @return object   update query collector object
      */
-    public static function update($table, array $set = []): Update
+    public static function update(string $table, array $set = []): Update
     {
         return new Update($table, $set);
     }
@@ -149,10 +146,10 @@ class DB
     /**
      * Creates a delete collector object.
      *
-     * @param string   $table  table to delete from
-     * @return object   delete query collector object
+     * @param string|null $table table to delete from
+     * @return Delete
      */
-    public static function delete($table = null): Delete
+    public static function delete(?string $table = null): Delete
     {
         return new Delete($table);
     }
@@ -161,17 +158,14 @@ class DB
      * Creates an insert collector object.
      *
      * @param string   $table  table to insert into
-     * @return object   insert query collector object
      */
-    public static function insert($table): Insert
+    public static function insert(string $table): Insert
     {
         return new Insert($table);
     }
 
     /**
      * Creates a schema collector object.
-     *
-     * @return object schema query collector object
      */
     public static function schema(): Schema
     {
@@ -181,9 +175,10 @@ class DB
     /**
      * Return an Immutable YYYY-MM-DD HH:II:SS date format.
      *
-     * @return string Immutable datetime string.
+     * @return DateTime Immutable datetime object.
+     * @throws InvalidDateException
      */
-    public static function now()
+    public static function now(): DateTime
     {
         return DateTime::now();
     }

@@ -41,44 +41,32 @@ use function substr;
 class SQLite extends Compiler
 {
     /** @var string[] $modifiers */
-    protected $modifiers = ['nullable', 'default', 'autoincrement'];
+    protected array $modifiers = ['nullable', 'default', 'autoincrement'];
 
     /** @var string $autoincrement */
-    protected $autoincrement = 'AUTOINCREMENT';
+    protected string $autoincrement = 'AUTOINCREMENT';
 
     /** @var bool $nopk No primary key */
     private bool $nopk = false;
 
-    /**
-     * @inheritDoc
-     */
     protected function handleTypeInteger(BaseColumn $column): string
     {
         return 'INTEGER';
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function handleTypeTime(BaseColumn $column): string
     {
         return 'DATETIME';
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function handleTypeTimestamp(BaseColumn $column): string
     {
         return 'DATETIME';
     }
 
-    /**
-     * @inheritDoc
-     */
     public function handleModifierAutoincrement(BaseColumn $column): string
     {
-        $modifier = parent::handleModifierAutoincrement($column);
+        $modifier = parent::handleModifierAutoincrement(column: $column);
 
         if ($modifier !== '') {
             $this->nopk = true;
@@ -88,16 +76,13 @@ class SQLite extends Compiler
         return $modifier;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function handlePrimaryKey(CreateTable $schema): string
     {
         if ($this->nopk) {
             return '';
         }
 
-        return parent::handlePrimaryKey($schema);
+        return parent::handlePrimaryKey(schema: $schema);
     }
 
     /**
@@ -113,8 +98,8 @@ class SQLite extends Compiler
      */
     protected function handleAddUnique(AlterTable $table, $data): string
     {
-        return 'CREATE UNIQUE INDEX ' . $this->wrap($data['name']) . ' ON '
-        . $this->wrap($table->getTableName()) . '(' . $this->wrapArray($data['columns']) . ')';
+        return 'CREATE UNIQUE INDEX ' . $this->wrap(name: $data['name']) . ' ON '
+        . $this->wrap(name: $table->getTableName()) . '(' . $this->wrapArray(value: $data['columns']) . ')';
     }
 
     /**
@@ -122,8 +107,8 @@ class SQLite extends Compiler
      */
     protected function handleAddIndex(AlterTable $table, $data): string
     {
-        return 'CREATE INDEX ' . $this->wrap($data['name']) . ' ON '
-        . $this->wrap($table->getTableName()) . '(' . $this->wrapArray($data['columns']) . ')';
+        return 'CREATE INDEX ' . $this->wrap(name: $data['name']) . ' ON '
+        . $this->wrap(name: $table->getTableName()) . '(' . $this->wrapArray(value: $data['columns']) . ')';
     }
 
     /**
@@ -132,7 +117,7 @@ class SQLite extends Compiler
     public function currentDatabase(string $dsn): array
     {
         return [
-            'result' => substr($dsn, strpos($dsn, ':') + 1),
+            'result' => substr(string: $dsn, offset: strpos(haystack: $dsn, needle: ':') + 1),
         ];
     }
 
@@ -141,8 +126,8 @@ class SQLite extends Compiler
      */
     public function getTables(string $database): array
     {
-        $sql = 'SELECT ' . $this->wrap('name') . ' FROM ' . $this->wrap('sqlite_master')
-        . ' WHERE type = ? ORDER BY ' . $this->wrap('name') . ' ASC';
+        $sql = 'SELECT ' . $this->wrap(name: 'name') . ' FROM ' . $this->wrap(name: 'sqlite_master')
+        . ' WHERE type = ? ORDER BY ' . $this->wrap(name: 'name') . ' ASC';
 
         return [
             'sql'    => $sql,
@@ -156,7 +141,7 @@ class SQLite extends Compiler
     public function getColumns(string $database, string $table): array
     {
         return [
-            'sql'    => 'PRAGMA table_info(' . $this->wrap($table) . ')',
+            'sql'    => 'PRAGMA table_info(' . $this->wrap(name: $table) . ')',
             'params' => [],
         ];
     }
@@ -167,7 +152,7 @@ class SQLite extends Compiler
     public function renameTable(string $current, string $new): array
     {
         return [
-            'sql'    => 'ALTER TABLE ' . $this->wrap($current) . ' RENAME TO ' . $this->wrap($new),
+            'sql'    => 'ALTER TABLE ' . $this->wrap(name: $current) . ' RENAME TO ' . $this->wrap(name: $new),
             'params' => [],
         ];
     }

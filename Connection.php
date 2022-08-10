@@ -27,6 +27,7 @@ use function end;
 use function is_callable;
 use function is_object;
 use function method_exists;
+use function Qubus\Support\Helpers\is_null__;
 use function strtolower;
 use function ucfirst;
 
@@ -49,8 +50,8 @@ abstract class Connection
         'prepare'        => false,
     ];
 
-    /** @var collection of executed queries */
-    protected $queries = [];
+    /** @var array collection of executed queries */
+    protected array $queries = [];
 
     /** @var array  profiler callbacks */
     protected array $profilerCallbacks = [
@@ -64,11 +65,10 @@ abstract class Connection
     /**
      * Returns a connection instance based on the config.
      *
-     * @param   array   Connection config
-     * @return  object  A new connection instance.
-     * @throws  Qubus\Exception\Exception When connection.
+     * @param array $config Connection config
+     * @throws Exception
      */
-    public static function instance($config = [])
+    public static function instance(array $config = []): Connection
     {
         $config = array_merge(self::DEFAULT_PARAMETERS, $config);
 
@@ -85,7 +85,7 @@ abstract class Connection
     /**
      * Constructor, sets the main config array.
      */
-    public function __construct($config = [])
+    public function __construct(array $config = [])
     {
         if (isset($config['username'])) {
             unset($config['username']);
@@ -98,17 +98,15 @@ abstract class Connection
         $this->config = $config;
     }
 
-    public function tablePrefix()
+    public function tablePrefix(): string
     {
         return $this->config['prefix'];
     }
 
     /**
      * Enables the profiling.
-     *
-     * @return  object  $this
      */
-    public function enableProfiler()
+    public function enableProfiler(): static
     {
         $this->config['profiling'] = true;
 
@@ -117,10 +115,8 @@ abstract class Connection
 
     /**
      * Enables the profiling, will clear out past queries on next execution.
-     *
-     * @return  object  $this
      */
-    public function disableProfiling()
+    public function disableProfiling(): static
     {
         $this->config['profiling'] = false;
 
@@ -128,11 +124,11 @@ abstract class Connection
     }
 
     /**
-     * Returnes the last executed query.
+     * Returns the last executed query.
      *
      * @return  mixed  last executed query
      */
-    public function lastQuery()
+    public function lastQuery(): mixed
     {
         return $last = end($this->queries) ? $last['query'] : null;
     }
@@ -140,9 +136,9 @@ abstract class Connection
     /**
      * Returns an array of fired queries.
      *
-     * @retun  array  fired queries
+     * @return  array  fired queries
      */
-    public function queries()
+    public function queries(): array
     {
         return array_map(function ($i) {
             return $i['query'];
@@ -154,17 +150,15 @@ abstract class Connection
      *
      * @return  array  profiler data about the queries
      */
-    public function profilerQueries()
+    public function profilerQueries(): array
     {
         return $this->queries;
     }
 
     /**
      * Returns the fired queries with profiling data.
-     *
-     * @return  array  profiler data about the queries
      */
-    public function profilerCallbacks($start = null, $end = null)
+    public function profilerCallbacks(mixed $start = null, mixed $end = null): void
     {
         $this->profilerCallbacks['start'] = $start;
         $this->profilerCallbacks['end'] = $end;
@@ -173,13 +167,12 @@ abstract class Connection
     /**
      * Run transactional queries.
      *
-     * @param   Closure  $callback  transaction callback
-     * @return  object   $this
-     * @throws
+     * @param Closure $callback transaction callback
+     * @throws Exception
      */
-    public function transaction(Closure $callback, $that = null)
+    public function transaction(Closure $callback, mixed $that = null, mixed $default = null)
     {
-        if ($that === null) {
+        if (is_null__($that)) {
             $that = $this;
         }
 
@@ -188,44 +181,57 @@ abstract class Connection
             return $callback($that);
         }
 
+        $result = $default;
+
         try {
             // start the transaction
             $this->startTransaction();
 
             // execute the callback
-            $callback($this);
+            $result = $callback($this);
 
             // all fine, commit the transaction
             $this->commitTransaction();
         }
         // catch any errors generated in the callback
         catch (PDOException $e) {
-            // rolleback on error
+            // rollback on error
             $this->rollbackTransaction();
-            throw $e;
+            throw new DbalException(message: $e->getMessage(), code: (int) $e->getCode());
         }
 
-        return $this;
+        return $result;
     }
 
     /**
      * Transaction functions.
+     *
+     * @throws Exception
      */
     public function inTransaction()
     {
         throw new Exception('Transactions are not supported by this driver.');
     }
-    
+
+    /**
+     * @throws Exception
+     */
     public function startTransaction()
     {
         throw new Exception('Transactions are not supported by this driver.');
     }
 
+    /**
+     * @throws Exception
+     */
     public function commitTransaction()
     {
         throw new Exception('Transactions are not supported by this driver.');
     }
 
+    /**
+     * @throws Exception
+     */
     public function rollbackTransaction()
     {
         throw new Exception('Transactions are not supported by this driver.');
@@ -233,18 +239,26 @@ abstract class Connection
 
     /**
      * Savepoints functions.
+     *
+     * @throws Exception
      */
-    public function setSavepoint($savepoint = null)
+    public function setSavepoint(mixed $savepoint = null)
     {
         throw new Exception('Savepoints are not supported by this driver.');
     }
 
-    public function rollbackSavepoint($savepoint = null)
+    /**
+     * @throws Exception
+     */
+    public function rollbackSavepoint(mixed $savepoint = null)
     {
         throw new Exception('Savepoints are not supported by this driver.');
     }
 
-    public function releaseSavepoint($savepoint = null)
+    /**
+     * @throws Exception
+     */
+    public function releaseSavepoint(mixed $savepoint = null)
     {
         throw new Exception('Savepoints are not supported by this driver.');
     }
@@ -254,10 +268,9 @@ abstract class Connection
      *
      * @param   string  $func  function name
      * @param   array   $args  function arguments
-     * @return  forwarded result (with set connection)
-     * @throws BadMethodCallException when method doesn't exist.
+     * @throws BadMethodCallException When method doesn't exist.
      */
-    public function __call($func, $args)
+    public function __call(string $func, array $args)
     {
         $call = '\\Qubus\\Dbal\\DB::' . $func;
 
@@ -277,7 +290,7 @@ abstract class Connection
     /**
      * List databases.
      *
-     * @return  array  databases.
+     * @throws Exception
      */
     public function listDatabases()
     {
@@ -287,7 +300,7 @@ abstract class Connection
     /**
      * List database tables.
      *
-     * @return  array  tables fields.
+     * @throws Exception
      */
     public function listTables()
     {
@@ -297,12 +310,12 @@ abstract class Connection
     /**
      * List table fields.
      *
-     * @return  array  databases.
+     * @throws Exception
      */
-    public function listFields($table)
+    public function listFields(mixed $table)
     {
         throw new Exception('List fields is not supported by this driver.');
     }
 
-    abstract public function quoteIdentifier($value);
+    abstract public function quoteIdentifier(mixed $value): mixed;
 }

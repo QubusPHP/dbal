@@ -35,18 +35,18 @@ class Where extends Collector
     /** @var int  $limit  query limit */
     public int $limit;
 
-    /** @var  array  $offset  query offset */
-    public $offset;
+    /** @var int $offset  query offset */
+    public int $offset;
 
     /**
      * Alias for andWhere.
      *
-     * @param   mixed   $column  array of 'and where' statements or column name
-     * @param   string  $op      where logic operator
-     * @param   mixed   $value   where value
-     * @return  object  current instance
+     * @param mixed $column Array of 'and where' statements or column name.
+     * @param string|null $op Where logic operator.
+     * @param mixed|null $value Where value.
+     * @return mixed Current instance.
      */
-    public function where($column, $op = null, $value = null)
+    public function where(mixed $column, string $op = null, mixed $value = null): mixed
     {
         return call_user_func_array([$this, 'andWhere'], func_get_args());
     }
@@ -54,12 +54,12 @@ class Where extends Collector
     /**
      * Adds an 'and where' statement to the query.
      *
-     * @param   mixed   $column  array of 'and where' statements or column name
-     * @param   string  $op      where logic operator
-     * @param   mixed   $value   where value
-     * @return  object  current instance
+     * @param mixed $column Array of 'and where' statements or column name.
+     * @param string|null $op Where logic operator.
+     * @param mixed|null $value Where value.
+     * @return static Current instance.
      */
-    public function andWhere($column, $op = null, $value = null)
+    public function andWhere(mixed $column, string $op = null, mixed $value = null): static
     {
         if ($column instanceof Closure) {
             $this->andWhereOpen();
@@ -71,21 +71,20 @@ class Where extends Collector
 
         if (func_num_args() === 2) {
             $value = $op;
-            $op = is_array($value) ? 'in' : '=';
+            $op = is_array(value: $value) ? 'in' : '=';
         }
 
-        return $this->where__('and', $column, $op, $value);
+        return $this->where__(type: 'and', column: $column, op: $op, value: $value);
     }
 
     /**
      * Adds an 'or where' statement to the query.
      *
      * @param   mixed   $column  array of 'or where' statements or column name
-     * @param   string  $op      where logic operator
-     * @param   mixed   $value   where value
-     * @return  object  current instance
+     * @param string|null $op      where logic operator
+     * @param mixed|null $value   where value
      */
-    public function orWhere($column, $op = null, $value = null)
+    public function orWhere(mixed $column, string $op = null, mixed $value = null): static
     {
         if ($column instanceof Closure) {
             $this->orWhereOpen();
@@ -97,21 +96,20 @@ class Where extends Collector
 
         if (func_num_args() === 2) {
             $value = $op;
-            $op = is_array($value) ? 'in' : '=';
+            $op = is_array(value: $value) ? 'in' : '=';
         }
 
-        return $this->where__('or', $column, $op, $value);
+        return $this->where__(type: 'or', column: $column, op: $op, value: $value);
     }
 
     /**
      * Alias for andWhere.
      *
      * @param   mixed   $column  array of 'and not where' statements or column name
-     * @param   string  $op      where logic operator
-     * @param   mixed   $value   where value
-     * @return  object  current instance
+     * @param string|null $op      where logic operator
+     * @param mixed|null $value   where value
      */
-    public function notWhere($column, $op = null, $value = null)
+    public function notWhere(mixed $column, string $op = null, mixed $value = null)
     {
         return call_user_func_array([$this, 'andNotWhere'], func_get_args());
     }
@@ -120,11 +118,10 @@ class Where extends Collector
      * Adds an 'and not where' statement to the query.
      *
      * @param   mixed   $column  array of 'and where' statements or column name
-     * @param   string  $op      where logic operator
-     * @param   mixed   $value   where value
-     * @return  object  current instance
+     * @param string|null $op      where logic operator
+     * @param mixed|null $value   where value
      */
-    public function andNotWhere($column, $op = null, $value = null)
+    public function andNotWhere(mixed $column, string $op = null, mixed $value = null): static
     {
         if ($column instanceof Closure) {
             $this->andNotWhereOpen();
@@ -136,21 +133,20 @@ class Where extends Collector
 
         if (func_num_args() === 2) {
             $value = $op;
-            $op = is_array($value) ? 'in' : '=';
+            $op = is_array(value: $value) ? 'in' : '=';
         }
 
-        return $this->where__('and', $column, $op, $value, true);
+        return $this->where__(type: 'and', column: $column, op: $op, value: $value, not: true);
     }
 
     /**
      * Adds an 'or not where' statement to the query.
      *
      * @param   mixed   $column  array of 'or where' statements or column name
-     * @param   string  $op      where logic operator
-     * @param   mixed   $value   where value
-     * @return  object  Current instance.
+     * @param string|null $op      where logic operator
+     * @param mixed|null $value   where value
      */
-    public function orNotWhere($column, $op = null, $value = null)
+    public function orNotWhere(mixed $column, string $op = null, mixed $value = null): static
     {
         if ($column instanceof Closure) {
             $this->orNotWhereOpen();
@@ -162,18 +158,16 @@ class Where extends Collector
 
         if (func_num_args() === 2) {
             $value = $op;
-            $op = is_array($value) ? 'in' : '=';
+            $op = is_array(value: $value) ? 'in' : '=';
         }
 
-        return $this->where__('or', $column, $op, $value, true);
+        return $this->where__(type: 'or', column: $column, op: $op, value: $value, not: true);
     }
 
     /**
      * Opens an 'and where' nesting.
-     *
-     * @return  object  current instance
      */
-    public function whereOpen()
+    public function whereOpen(): static
     {
         $this->where[] = [
             'type'    => 'and',
@@ -185,10 +179,8 @@ class Where extends Collector
 
     /**
      * Closes an 'and where' nesting.
-     *
-     * @return  object  current instance
      */
-    public function whereClose()
+    public function whereClose(): static
     {
         $this->where[] = [
             'nesting' => 'close',
@@ -199,10 +191,8 @@ class Where extends Collector
 
     /**
      * Opens an 'and where' nesting.
-     *
-     * @return  object  current instance
      */
-    public function andWhereOpen()
+    public function andWhereOpen(): static
     {
         $this->where[] = [
             'type'    => 'and',
@@ -214,20 +204,16 @@ class Where extends Collector
 
     /**
      * Closes an 'and where' nesting.
-     *
-     * @return  object  current instance
      */
-    public function andWhereClose()
+    public function andWhereClose(): static
     {
         return $this->whereClose();
     }
 
     /**
      * Opens an 'or where' nesting.
-     *
-     * @return  object  current instance
      */
-    public function orWhereOpen()
+    public function orWhereOpen(): static
     {
         $this->where[] = [
             'type'    => 'or',
@@ -239,20 +225,16 @@ class Where extends Collector
 
     /**
      * Closes an 'or where' nesting.
-     *
-     * @return  object  current instance
      */
-    public function orWhereClose()
+    public function orWhereClose(): static
     {
         return $this->whereClose();
     }
 
     /**
      * Opens an 'and not where' nesting.
-     *
-     * @return  object  current instance
      */
-    public function notWhereOpen()
+    public function notWhereOpen(): static
     {
         $this->where[] = [
             'type'    => 'and',
@@ -265,20 +247,16 @@ class Where extends Collector
 
     /**
      * Closes an 'and not where' nesting.
-     *
-     * @return  object  current instance
      */
-    public function notWhereClose()
+    public function notWhereClose(): static
     {
         return $this->whereClose();
     }
 
     /**
      * Opens an 'and not where' nesting.
-     *
-     * @return  object  current instance
      */
-    public function andNotWhereOpen()
+    public function andNotWhereOpen(): static
     {
         $this->where[] = [
             'type'    => 'and',
@@ -291,20 +269,16 @@ class Where extends Collector
 
     /**
      * Closes an 'and not where' nesting.
-     *
-     * @return  object  current instance
      */
-    public function andNotWhereClose()
+    public function andNotWhereClose(): static
     {
         return $this->whereClose();
     }
 
     /**
      * Opens an 'or not where' nesting.
-     *
-     * @return  object  current instance
      */
-    public function orNotWhereOpen()
+    public function orNotWhereOpen(): static
     {
         $this->where[] = [
             'type'    => 'or',
@@ -317,10 +291,8 @@ class Where extends Collector
 
     /**
      * Closes an 'or where' nesting.
-     *
-     * @return object Current instance.
      */
-    public function orNotWhereClose()
+    public function orNotWhereClose(): static
     {
         return $this->whereClose();
     }
@@ -328,18 +300,17 @@ class Where extends Collector
     /**
      * Adds an 'and where' statement to the query
      *
-     * @param  string $type    chain type
-     * @param  mixed  $column  array of 'where' statements or column name
-     * @param  string $op      where logic operator
-     * @param  mixed  $value   where value
-     * @param  bool   $not     wether to use NOT
-     * @return object Current instance
+     * @param string $type    chain type.
+     * @param  mixed  $column  array of 'where' statements or column name.
+     * @param string $op      where logic operator.
+     * @param  mixed  $value   where value.
+     * @param bool $not     whether to use NOT.
      */
-    protected function where__($type, $column, $op, $value, $not = false)
+    protected function where__(string $type, mixed $column, string $op, mixed $value, bool $not = false): static
     {
-        if (is_array($column) && $op = null && $value = null) {
+        if (is_array(value: $column) && $op = null && $value = null) {
             foreach ($column as $key => $val) {
-                if (is_array($val)) {
+                if (is_array(value: $val)) {
                     $numArgs = count($val);
 
                     if ($numArgs === 2) {
@@ -383,17 +354,16 @@ class Where extends Collector
     }
 
     /**
-     * Adds an 'order by' statment to the query.
+     * Adds an 'order by' statement to the query.
      *
-     * @param   string|array  $column     Array of statements or column name.
-     * @param   string        $direction  Optional order direction.
-     * @return  object        current instance
+     * @param array|string $column Array of statements or column name.
+     * @param string|null $direction Optional order direction.
      */
-    public function orderBy($column, ?string $direction = null)
+    public function orderBy(array|string $column, ?string $direction = null): static
     {
-        if (is_array($column)) {
+        if (is_array(value: $column)) {
             foreach ($column as $key => $val) {
-                if (is_numeric($key)) {
+                if (is_numeric(value: $key)) {
                     $key = $val;
                     $val = null;
                 }
@@ -416,11 +386,10 @@ class Where extends Collector
     /**
      * Sets a limit [and offset] for the query
      *
-     * @param   int     limit integer
-     * @param   int     offset integer
-     * @return  object  current instance
+     * @param   int $limit limit integer
+     * @param   int $offset offset integer
      */
-    public function limit(int $limit, int $offset = 0)
+    public function limit(int $limit, int $offset = 0): static
     {
         $this->limit = (int) $limit;
         func_num_args() > 1 && $this->offset = (int) $offset;
@@ -431,10 +400,9 @@ class Where extends Collector
     /**
      * Sets an offset for the query
      *
-     * @param   int     offset integer
-     * @return  object  current instance
+     * @param int $offset offset integer
      */
-    public function offset($offset)
+    public function offset(int $offset): static
     {
         $this->offset = (int) $offset;
 
