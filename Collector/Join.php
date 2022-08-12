@@ -24,7 +24,7 @@ class Join
     protected string $table;
 
     /** @var  ?string $type  join type */
-    protected ?string $type;
+    protected ?string $type = null;
 
     /** @var  array  $on  array of on statements */
     protected array $on = [];
