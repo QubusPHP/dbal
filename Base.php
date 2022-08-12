@@ -21,7 +21,7 @@ use function is_array;
 abstract class Base
 {
     /** @var bool|string|null $asOjbect True for stCLass or string classname. */
-    protected bool|string|null $asObject;
+    protected bool|string|null $asObject = null;
 
     /** @var bool $propertiesLate  true for assigning properties after object creation */
     protected bool $propertiesLate;
