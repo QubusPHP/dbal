@@ -45,7 +45,7 @@ class Schema
     protected Connection $connection;
 
     /** @var array|null $tableList Table list. */
-    protected ?array $tableList;
+    protected ?array $tableList = null;
 
     /** @var string $currentDatabase Currently used database name. */
     protected string $currentDatabase;
