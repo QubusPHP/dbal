@@ -1,3 +1,6 @@
+## 1.0.1 (2022-08.11)
+- Fixed issues with before class initialization
+
 ## 1.0.0 (2022-08.10)
 - Minimum PHP version 8.1
 - Updated code to meet PHP 8
