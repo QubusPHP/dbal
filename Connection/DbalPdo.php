@@ -117,7 +117,8 @@ class DbalPdo extends Connection
             'password'      => null,
             'attrs'         => [],
             'insertIdField' => null,
-            'charset'       => 'UTF8',
+            'charset'       => 'utf8mb4',
+            'collation'     => 'utf8mb4_unicode_ci',
             'persistent'    => false,
         ], $config);
 
@@ -199,7 +200,8 @@ class DbalPdo extends Connection
         $params = $this->config;
         if ($this->getName(driver: $params['driver']) === 'mysql') {
             if (defined(constant_name: 'PDO::MYSQL_ATTR_INIT_COMMAND')) {
-                $options[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES ' . $params['charset'];
+                $options[PDO::MYSQL_ATTR_INIT_COMMAND] =
+                    'SET NAMES ' . $params['charset'] . ' COLLATE ' . $params['collation'];
             }
 
             $command[] = 'SET SQL_MODE=ANSI_QUOTES';
@@ -220,7 +222,7 @@ class DbalPdo extends Connection
         }
 
         if (! isset($options[PDO::MYSQL_ATTR_INIT_COMMAND]) && ($this->getName(driver: $params['driver']) !== 'oci')) {
-            $command[] = 'SET NAMES ' . $params['charset'];
+            $command[] = 'SET NAMES ' . $params['charset'] . ' COLLATE ' . $params['collation'];
         }
 
         if ($this->getName(driver: $params['driver']) === 'sqlsrv') {
