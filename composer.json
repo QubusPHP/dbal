@@ -15,7 +15,7 @@
         "ext-pdo": "*",
         "psr/cache": "^3.0",
         "qubus/exception": "^2.0",
-        "qubus/support": "^2.1",
+        "qubus/support": "^2.2",
         "qubus/valueobjects": "^2.0"
     },
     "require-dev": {
