@@ -35,9 +35,9 @@ use function strtolower;
 
 class BaseColumn
 {
-    protected string $name;
+    protected ?string $name = null;
 
-    protected string $type;
+    protected ?string $type = null;
 
     /** @var array $properties */
     protected array $properties = [];

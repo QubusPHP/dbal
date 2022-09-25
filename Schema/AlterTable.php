@@ -36,7 +36,7 @@ use function Qubus\Support\Helpers\is_null__;
 
 class AlterTable
 {
-    protected string $table;
+    protected ?string $table = null;
 
     /** @var array $commands */
     protected array $commands = [];

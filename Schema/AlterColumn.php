@@ -32,8 +32,8 @@ namespace Qubus\Dbal\Schema;
 
 class AlterColumn extends BaseColumn
 {
-    /** @var string|AlterTable $table */
-    protected string|AlterTable $table;
+    /** @var string|AlterTable|null $table */
+    protected string|AlterTable|null $table = null;
 
     public function __construct(AlterTable $table, string $name, ?string $type = null)
     {

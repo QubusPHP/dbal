@@ -35,16 +35,16 @@ use function strtoupper;
 
 class ForeignKey
 {
-    protected string $refTable;
+    protected ?string $refTable = null;
 
     /** @var string[] $refColumns */
-    protected array $refColumns;
+    protected array $refColumns = [];
 
     /** @var array $actions */
     protected array $actions = [];
 
     /** @var string[] $columns */
-    protected array $columns;
+    protected array $columns = [];
 
     /**
      * @param string[] $columns

@@ -64,23 +64,23 @@ class DbalPdo extends Connection
     /** @var  string  $tableQuote  table quote */
     protected static string $tableQuote = '`';
 
-    /** @var  string  $driver */
-    protected string $driver;
+    /** @var  ?string  $driver */
+    protected ?string $driver = null;
 
     /** @var  ?Compiler $compiler  Dbal Compiler object */
     protected ?Compiler $compiler = null;
 
-    /** @var  string  $insertIdField  field used for lastInsertId */
-    public string $insertIdField;
+    /** @var  ?string  $insertIdField  field used for lastInsertId */
+    public ?string $insertIdField = null;
 
-    /** @var  string  $charset  connection charset */
-    public string $charset;
+    /** @var  ?string  $charset  connection charset */
+    public ?string $charset = null;
 
     /** @var  int  $savepoint  auto savepoint level */
     protected int $savepoint = 0;
 
     /** @var array $config */
-    protected array $config;
+    protected array $config = [];
 
     /** @var ?PDO pdoInstance */
     protected ?PDO $pdoInstance = null;
