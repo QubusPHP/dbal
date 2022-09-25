@@ -32,8 +32,8 @@ namespace Qubus\Dbal\Schema;
 
 class CreateColumn extends BaseColumn
 {
-    /** @var CreateTable $table */
-    protected CreateTable $table;
+    /** @var ?CreateTable $table */
+    protected ?CreateTable $table = null;
 
     public function __construct(CreateTable $table, string $name, string $type)
     {

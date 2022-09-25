@@ -27,8 +27,8 @@ use function trim;
 
 abstract class Compiler
 {
-    /** @var Connection $connection Dbal connection object. */
-    protected Connection $connection;
+    /** @var ?Connection $connection Dbal connection object. */
+    protected ?Connection $connection = null;
 
     /** @var  array  $query  query commands */
     protected array $query = [];

@@ -41,14 +41,14 @@ use function strtolower;
 
 class Schema
 {
-    /** @var Connection Connection. */
-    protected Connection $connection;
+    /** @var ?Connection Connection. */
+    protected ?Connection $connection = null;
 
     /** @var array|null $tableList Table list. */
     protected ?array $tableList = null;
 
-    /** @var string $currentDatabase Currently used database name. */
-    protected string $currentDatabase;
+    /** @var ?string $currentDatabase Currently used database name. */
+    protected ?string $currentDatabase = null;
 
     /** @var array $columns Column list */
     protected array $columns = [];

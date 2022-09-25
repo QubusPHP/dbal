@@ -23,7 +23,7 @@ class Update extends Where
     /** @var  string  $type  query type */
     protected string $type = DB::UPDATE;
 
-    protected array $values;
+    protected array $values = [];
 
     /**
      * Constructor, sets the table name
