@@ -29,8 +29,8 @@ class Insert extends Collector
     /** @var  string  $type  query type */
     protected string $type = DB::INSERT;
 
-    /** @var  ?string  $insertIdField  field used for lastInsertId */
-    public ?string $insertIdField = null;
+    /** @var  Insert|string|null  $insertIdField  field used for lastInsertId */
+    public Insert|string|null $insertIdField = null;
 
     /** @var  array  $columns  columns to use */
     public array $columns = [];
@@ -48,9 +48,9 @@ class Insert extends Collector
      * Sets/Gets the field used for lastInsertId
      *
      * @param string|null $field
-     * @return  string|static  current instance when setting, string fieldname when getting.
+     * @return Insert|string|null current instance when setting, string fieldname when getting.
      */
-    public function insertIdField(string $field = null): static|string
+    public function insertIdField(string $field = null): static|string|null
     {
         if ($field) {
             $this->insertIdField = $field;
