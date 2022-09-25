@@ -32,11 +32,11 @@ abstract class Base
     /** @var  array  $bindings  query bindings */
     protected array $bindings = [];
 
-    /** @var  string  $type  query type */
-    protected string $type;
+    /** @var  ?string  $type  query type */
+    protected ?string $type = null;
 
-    /** @var  Connection $connection  connection object */
-    protected Connection $connection;
+    /** @var  ?Connection $connection  connection object */
+    protected ?Connection $connection = null;
 
     /**
      * Bind a value to the query.
