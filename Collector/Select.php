@@ -27,8 +27,8 @@ use function is_array;
 
 class Select extends Where
 {
-    /** @var string $type  query type */
-    protected string $type = DB::SELECT;
+    /** @var ?string $type  query type */
+    protected ?string $type = DB::SELECT;
 
     /** @var array $having  having conditions */
     public array $having = [];
