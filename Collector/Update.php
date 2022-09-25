@@ -20,8 +20,8 @@ use function is_array;
 
 class Update extends Where
 {
-    /** @var  string  $type  query type */
-    protected string $type = DB::UPDATE;
+    /** @var  ?string  $type  query type */
+    protected ?string $type = DB::UPDATE;
 
     protected array $values = [];
 
