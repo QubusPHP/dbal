@@ -22,7 +22,7 @@ use function implode;
 class Pgsql extends Sql
 {
     /**
-     * Compiles a PGSQL concatination.
+     * Compiles a PGSQL concatenation.
      *
      * @param mixed $value  Fn object.
      * @return string compiles concat.
