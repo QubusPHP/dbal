@@ -51,14 +51,14 @@ class CreateTable
     /** @var array $foreignKeys */
     protected array $foreignKeys = [];
 
-    /** @var string */
-    protected string $table;
+    /** @var ?string */
+    protected ?string $table = null;
 
     /** @var string|null */
     protected ?string $engine = null;
 
-    /** @var BaseColumn $autoincrement */
-    protected BaseColumn $autoincrement;
+    /** @var ?BaseColumn $autoincrement */
+    protected ?BaseColumn $autoincrement = null;
 
     public function __construct(string $table)
     {

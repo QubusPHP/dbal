@@ -20,8 +20,8 @@ use function func_num_args;
 
 class Join
 {
-    /** @var  string  $table  table to join */
-    protected string $table;
+    /** @var  ?string  $table  table to join */
+    protected ?string $table = null;
 
     /** @var  ?string $type  join type */
     protected ?string $type = null;

@@ -29,8 +29,8 @@ class Insert extends Collector
     /** @var  string  $type  query type */
     protected string $type = DB::INSERT;
 
-    /** @var  string  $insertIdField  field used for lastInsertId */
-    public string $insertIdField;
+    /** @var  ?string  $insertIdField  field used for lastInsertId */
+    public ?string $insertIdField = null;
 
     /** @var  array  $columns  columns to use */
     public array $columns = [];

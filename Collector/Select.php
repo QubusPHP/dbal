@@ -36,8 +36,8 @@ class Select extends Where
     /** @var array $groupBy  GROUP BY clause */
     public array $groupBy = [];
 
-    /** @var Join $lastJoin Last join object */
-    protected Join $lastJoin;
+    /** @var ?Join $lastJoin Last join object */
+    protected ?Join $lastJoin = null;
 
     /** @var array $joins  query joins */
     public array $joins = [];
