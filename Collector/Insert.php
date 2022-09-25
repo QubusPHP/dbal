@@ -26,8 +26,8 @@ use function reset;
 
 class Insert extends Collector
 {
-    /** @var  string  $type  query type */
-    protected string $type = DB::INSERT;
+    /** @var  ?string  $type  query type */
+    protected ?string $type = DB::INSERT;
 
     /** @var  Insert|string|null  $insertIdField  field used for lastInsertId */
     public Insert|string|null $insertIdField = null;
