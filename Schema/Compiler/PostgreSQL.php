@@ -44,7 +44,7 @@ class PostgreSQL extends Compiler
     {
         $autoincrement = $column->get(name: 'autoincrement', default: false);
 
-        return match($column->get(name: 'size', default: 'normal')) {
+        return match ($column->get(name: 'size', default: 'normal')) {
             'tiny', 'small' => $autoincrement ? 'SMALLSERIAL' : 'SMALLINT',
             'medium' => $autoincrement ? 'SERIAL' : 'INTEGER',
             'big' => $autoincrement ? 'BIGSERIAL' : 'BIGINT',

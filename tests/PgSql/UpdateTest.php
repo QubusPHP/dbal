@@ -28,7 +28,7 @@ try {
 } catch (Exception $e) {
 }
 
-it('should build simple update string.', function() use($connection) {
+it('should build simple update string.', function () use ($connection) {
     $expected = 'UPDATE "my_table" SET "field" = \'value\'';
 
     $query = $connection
@@ -41,7 +41,7 @@ it('should build simple update string.', function() use($connection) {
     Assert::assertEquals($expected, $query);
 });
 
-it('should build update string with multiple field sets.', function() use($connection) {
+it('should build update string with multiple field sets.', function () use ($connection) {
     $expected = 'UPDATE "my_table" SET "field" = \'value\', "another_field" = 1';
 
     $query = $connection
@@ -55,7 +55,7 @@ it('should build update string with multiple field sets.', function() use($conne
     Assert::assertEquals($expected, $query);
 });
 
-it('should build update string with where condition.', function() use($connection) {
+it('should build update string with where condition.', function () use ($connection) {
     $expected = 'UPDATE "my_table" SET "field" = \'value\' WHERE "field" = \'other value\'';
 
     $query = $connection

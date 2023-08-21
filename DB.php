@@ -20,7 +20,6 @@ use Qubus\Dbal\Collector\Select;
 use Qubus\Dbal\Collector\Update;
 use Qubus\Exception\Exception;
 use Qubus\ValueObjects\DateTime\DateTime;
-
 use Qubus\ValueObjects\DateTime\Exception\InvalidDateException;
 
 use function func_get_args;

@@ -30,7 +30,6 @@ declare(strict_types=1);
 
 namespace Qubus\Dbal;
 
-use Qubus\Dbal\Connection;
 use Qubus\Dbal\Schema\AlterTable;
 use Qubus\Dbal\Schema\CreateTable;
 use Qubus\Exception\Exception;

@@ -30,7 +30,7 @@ try {
 } catch (Exception $e) {
 }
 
-it('should build simple select string.', function() use($connection) {
+it('should build simple select string.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table`";
 
     $query = $connection
@@ -40,7 +40,7 @@ it('should build simple select string.', function() use($connection) {
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with LIKE.', function() use($connection) {
+it('should build select string with LIKE.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` WHERE `field` LIKE '%this%'";
 
     $query = $connection
@@ -51,7 +51,7 @@ it('should build select string with LIKE.', function() use($connection) {
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with comma delimited fields.', function() use($connection) {
+it('should build select string with comma delimited fields.', function () use ($connection) {
     $expected = "SELECT `column`, `other` FROM `my_table`";
 
     $query = $connection
@@ -61,7 +61,7 @@ it('should build select string with comma delimited fields.', function() use($co
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with aliased field.', function() use($connection) {
+it('should build select string with aliased field.', function () use ($connection) {
     $expected = "SELECT `column` AS `alias`, `other` FROM `my_table`";
 
     $query = $connection
@@ -71,7 +71,7 @@ it('should build select string with aliased field.', function() use($connection)
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with function.', function() use($connection) {
+it('should build select string with function.', function () use ($connection) {
     $expected = "SELECT COUNT(*) FROM `my_table`";
 
     $query = $connection
@@ -81,7 +81,7 @@ it('should build select string with function.', function() use($connection) {
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with aliased function.', function() use($connection) {
+it('should build select string with aliased function.', function () use ($connection) {
     $expected = "SELECT COUNT(*) AS `num` FROM `my_table`";
 
     $query = $connection
@@ -91,7 +91,7 @@ it('should build select string with aliased function.', function() use($connecti
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with aliased function in array.', function() use($connection) {
+it('should build select string with aliased function in array.', function () use ($connection) {
     $expected = "SELECT COUNT(*) AS `alias` FROM `my_table`";
 
     $query = $connection
@@ -101,7 +101,7 @@ it('should build select string with aliased function in array.', function() use(
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with expression.', function() use($connection) {
+it('should build select string with expression.', function () use ($connection) {
     $expected = "SELECT expr FROM `my_table`";
 
     $query = $connection
@@ -111,7 +111,7 @@ it('should build select string with expression.', function() use($connection) {
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with field selection.', function() use($connection) {
+it('should build select string with field selection.', function () use ($connection) {
     $expected = "SELECT `column` FROM `my_table`";
 
     $query = $connection
@@ -121,7 +121,7 @@ it('should build select string with field selection.', function() use($connectio
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with multiple tables.', function() use($connection) {
+it('should build select string with multiple tables.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table`, `other_table`";
 
     $query = $connection
@@ -131,7 +131,7 @@ it('should build select string with multiple tables.', function() use($connectio
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with where condition.', function() use($connection) {
+it('should build select string with where condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` WHERE `field` = 'value'";
 
     $query = $connection
@@ -142,7 +142,7 @@ it('should build select string with where condition.', function() use($connectio
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with having condition.', function() use($connection) {
+it('should build select string with having condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` HAVING `field` = 'value'";
 
     $query = $connection
@@ -153,7 +153,7 @@ it('should build select string with having condition.', function() use($connecti
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with whereNot condition.', function() use($connection) {
+it('should build select string with whereNot condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` WHERE `field` = 'value' AND NOT `other_field` = 'other value'";
 
     $query = $connection
@@ -165,7 +165,7 @@ it('should build select string with whereNot condition.', function() use($connec
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with havingNot condition.', function() use($connection) {
+it('should build select string with havingNot condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` HAVING `field` = 'value' AND NOT `other_field` = 'other value'";
 
     $query = $connection
@@ -177,7 +177,7 @@ it('should build select string with havingNot condition.', function() use($conne
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with nested whereNot condition.', function() use($connection) {
+it('should build select string with nested whereNot condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` WHERE `field` = 'value' AND NOT (`something` = 'different' OR NOT `this` = 'crazy')";
 
     $query = $connection
@@ -192,7 +192,7 @@ it('should build select string with nested whereNot condition.', function() use(
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with nested havingNot condition.', function() use($connection) {
+it('should build select string with nested havingNot condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` HAVING `field` = 'value' AND NOT (`something` = 'different' OR NOT `this` = 'crazy')";
 
     $query = $connection
@@ -207,7 +207,7 @@ it('should build select string with nested havingNot condition.', function() use
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with whereNull condition.', function() use($connection) {
+it('should build select string with whereNull condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` WHERE `field` IS NULL";
 
     $query = $connection
@@ -218,7 +218,7 @@ it('should build select string with whereNull condition.', function() use($conne
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with havingNull condition.', function() use($connection) {
+it('should build select string with havingNull condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` HAVING `field` IS NULL";
 
     $query = $connection
@@ -229,7 +229,7 @@ it('should build select string with havingNull condition.', function() use($conn
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with whereNotNull condition.', function() use($connection) {
+it('should build select string with whereNotNull condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` WHERE `field` IS NOT NULL";
 
     $query = $connection
@@ -240,7 +240,7 @@ it('should build select string with whereNotNull condition.', function() use($co
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with havingNotNull condition.', function() use($connection) {
+it('should build select string with havingNotNull condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` HAVING `field` IS NOT NULL";
 
     $query = $connection
@@ -251,7 +251,7 @@ it('should build select string with havingNotNull condition.', function() use($c
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with orHaving condition.', function() use($connection) {
+it('should build select string with orHaving condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` HAVING `field` = 'value' OR `other` != 'other value'";
 
     $query = $connection
@@ -263,7 +263,7 @@ it('should build select string with orHaving condition.', function() use($connec
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with orWhere condition.', function() use($connection) {
+it('should build select string with orWhere condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` WHERE `field` = 'value' OR `other` != 'other value'";
 
     $query = $connection
@@ -275,7 +275,7 @@ it('should build select string with orWhere condition.', function() use($connect
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with andHaving condition.', function() use($connection) {
+it('should build select string with andHaving condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` HAVING `field` = 'value' AND `other` != 'other value'";
 
     $query = $connection
@@ -287,7 +287,7 @@ it('should build select string with andHaving condition.', function() use($conne
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with andWhere condition.', function() use($connection) {
+it('should build select string with andWhere condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` WHERE `field` = 'value' AND `other` != 'other value'";
 
     $query = $connection
@@ -299,7 +299,7 @@ it('should build select string with andWhere condition.', function() use($connec
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with where grouping.', function() use($connection) {
+it('should build select string with where grouping.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` WHERE `field` = 'value' AND (`other` != 'other value' OR `field` = 'something')";
 
     $query = $connection
@@ -312,7 +312,7 @@ it('should build select string with where grouping.', function() use($connection
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with having grouping.', function() use($connection) {
+it('should build select string with having grouping.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` HAVING `field` = 'value' AND (`other` != 'other value' OR `field` = 'something')";
 
     $query = $connection
@@ -325,7 +325,7 @@ it('should build select string with having grouping.', function() use($connectio
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with multiple where grouping.', function() use($connection) {
+it('should build select string with multiple where grouping.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` WHERE `field` = 'value' AND (`other` != 'other value' OR `field` = 'something') AND (`age` IN (1, 2, 3) OR `age` NOT IN (2, 5, 7))";
 
     $query = $connection
@@ -342,7 +342,7 @@ it('should build select string with multiple where grouping.', function() use($c
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with multiple having grouping.', function() use($connection) {
+it('should build select string with multiple having grouping.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` HAVING `field` = 'value' AND (`other` != 'other value' OR `field` = 'something') AND (`age` IN (1, 2, 3) OR `age` NOT IN (2, 5, 7))";
 
     $query = $connection
@@ -359,7 +359,7 @@ it('should build select string with multiple having grouping.', function() use($
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with whereIn condition.', function() use($connection) {
+it('should build select string with whereIn condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` WHERE `field` IN (1, 2, 3)";
 
     $query = $connection
@@ -370,7 +370,7 @@ it('should build select string with whereIn condition.', function() use($connect
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with havingIn condition.', function() use($connection) {
+it('should build select string with havingIn condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` HAVING `field` IN (1, 2, 3)";
 
     $query = $connection
@@ -381,7 +381,7 @@ it('should build select string with havingIn condition.', function() use($connec
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with whereNotIn condition.', function() use($connection) {
+it('should build select string with whereNotIn condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` WHERE `field` NOT IN (1, 2, 3)";
 
     $query = $connection
@@ -392,7 +392,7 @@ it('should build select string with whereNotIn condition.', function() use($conn
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with havingNotIn condition.', function() use($connection) {
+it('should build select string with havingNotIn condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` HAVING `field` NOT IN (1, 2, 3)";
 
     $query = $connection
@@ -403,7 +403,7 @@ it('should build select string with havingNotIn condition.', function() use($con
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with where function.', function() use($connection) {
+it('should build select string with where function.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` WHERE CHAR_LENGTH(`field`) > 2 AND CHAR_LENGTH(`field`) < 20";
 
     $query = $connection
@@ -415,7 +415,7 @@ it('should build select string with where function.', function() use($connection
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with simple join.', function() use($connection) {
+it('should build select string with simple join.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` JOIN `other_table` ON (`my_table`.`field` = `other_table`.`field`)";
 
     $query = $connection
@@ -427,7 +427,7 @@ it('should build select string with simple join.', function() use($connection) {
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with join andOn condition.', function() use($connection) {
+it('should build select string with join andOn condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` JOIN `other_table` ON (`my_table`.`field` = `other_table`.`field` AND `my_table`.`other_field` = `other_table`.`other_field`)";
 
     $query = $connection
@@ -440,7 +440,7 @@ it('should build select string with join andOn condition.', function() use($conn
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with join orOn condition.', function() use($connection) {
+it('should build select string with join orOn condition.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table` JOIN `other_table` ON (`my_table`.`field` = `other_table`.`field` OR `my_table`.`other_field` = `other_table`.`other_field`)";
 
     $query = $connection
@@ -453,7 +453,7 @@ it('should build select string with join orOn condition.', function() use($conne
     Assert::assertEquals($expected, $query);
 });
 
-it('should build select string with parameter binding.', function() use($connection) {
+it('should build select string with parameter binding.', function () use ($connection) {
     $expected = "SELECT * FROM `my_table`";
 
     $query = $connection
