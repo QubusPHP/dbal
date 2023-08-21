@@ -28,7 +28,7 @@ try {
 } catch (Exception $e) {
 }
 
-it('should build simple insert string.', function() use($connection) {
+it('should build simple insert string.', function () use ($connection) {
     $expected = 'INSERT INTO "my_table" () VALUES ()';
 
     $query = $connection
@@ -38,7 +38,7 @@ it('should build simple insert string.', function() use($connection) {
     Assert::assertEquals($expected, $query);
 });
 
-it('should build insert string with values.', function() use($connection) {
+it('should build insert string with values.', function () use ($connection) {
     $expected = 'INSERT INTO "my_table" ("id", "name") VALUES (1, \'Frank\')';
 
     $query = $connection
@@ -52,7 +52,7 @@ it('should build insert string with values.', function() use($connection) {
     Assert::assertEquals($expected, $query);
 });
 
-it('should build insert string with function.', function() use($connection) {
+it('should build insert string with function.', function () use ($connection) {
     $expected = 'INSERT INTO "my_table" ("id", "time") VALUES (1, NOW())';
 
     $query = $connection
@@ -66,7 +66,7 @@ it('should build insert string with function.', function() use($connection) {
     Assert::assertEquals($expected, $query);
 });
 
-it('should build insert string with expression.', function() use($connection) {
+it('should build insert string with expression.', function () use ($connection) {
     $expected = 'INSERT INTO "my_table" ("id", "expression") VALUES (1, \'value\')';
 
     $query = $connection

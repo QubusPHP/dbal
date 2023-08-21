@@ -29,7 +29,7 @@ class Sqlite extends DbalPdo
      *
      * @param string $charset  encoding
      */
-    public function setCharset(string $charset)
+    public function setCharset(string $charset): void
     {
         if ($charset) {
             $this->pdoInstance->exec(statement: 'PRAGMA encoding = ' . $this->quote(value: $charset));

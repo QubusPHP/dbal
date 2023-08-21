@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace Qubus\Dbal\Sql;
 
-use Qubus\Dbal\Sql\Compiler;
-
 use function array_key_exists;
 use function array_map;
 use function array_pop;
@@ -24,7 +22,6 @@ use function extract;
 use function implode;
 use function is_array;
 use function method_exists;
-use function Qubus\Support\Helpers\value;
 use function stripos;
 use function strtoupper;
 use function substr;

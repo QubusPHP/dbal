@@ -28,7 +28,7 @@ try {
 } catch (Exception $e) {
 }
 
-it('should build simple delete string.', function() use($connection) {
+it('should build simple delete string.', function () use ($connection) {
     $expected = "DELETE FROM `my_table`";
 
         $query = $connection
@@ -38,7 +38,7 @@ it('should build simple delete string.', function() use($connection) {
         Assert::assertEquals($expected, $query);
 });
 
-it('should build delete string with where condition.', function() use($connection) {
+it('should build delete string with where condition.', function () use ($connection) {
     $expected = "DELETE FROM `my_table` WHERE `field` = 'value'";
 
     $query = $connection
@@ -49,7 +49,7 @@ it('should build delete string with where condition.', function() use($connectio
     Assert::assertEquals($expected, $query);
 });
 
-it('should build delete string with where field IS NULL.', function() use($connection) {
+it('should build delete string with where field IS NULL.', function () use ($connection) {
     $expected = "DELETE FROM `my_table` WHERE `field` IS NULL";
 
     $query = $connection
@@ -60,7 +60,7 @@ it('should build delete string with where field IS NULL.', function() use($conne
     Assert::assertEquals($expected, $query);
 });
 
-it('should build delete string with where field IS NOT NULL.', function() use($connection) {
+it('should build delete string with where field IS NOT NULL.', function () use ($connection) {
     $expected = "DELETE FROM `my_table` WHERE `field` IS NOT NULL";
 
     $query = $connection
@@ -71,7 +71,7 @@ it('should build delete string with where field IS NOT NULL.', function() use($c
     Assert::assertEquals($expected, $query);
 });
 
-it('should build delete string with orWhere condition.', function() use($connection) {
+it('should build delete string with orWhere condition.', function () use ($connection) {
     $expected = "DELETE FROM `my_table` WHERE `field` = 'value' OR `other` != 'other value'";
 
     $query = $connection
@@ -83,7 +83,7 @@ it('should build delete string with orWhere condition.', function() use($connect
     Assert::assertEquals($expected, $query);
 });
 
-it('should build delete string with andWhere condition.', function() use($connection) {
+it('should build delete string with andWhere condition.', function () use ($connection) {
     $expected = "DELETE FROM `my_table` WHERE `field` = 'value' AND `other` != 'other value'";
 
     $query = $connection
@@ -95,7 +95,7 @@ it('should build delete string with andWhere condition.', function() use($connec
     Assert::assertEquals($expected, $query);
 });
 
-it('should build delete string with where grouping.', function() use($connection) {
+it('should build delete string with where grouping.', function () use ($connection) {
     $expected = "DELETE FROM `my_table` WHERE `field` = 'value' AND (`other` != 'other value' OR `field` = 'something')";
 
     $query = $connection
@@ -110,7 +110,7 @@ it('should build delete string with where grouping.', function() use($connection
     Assert::assertEquals($expected, $query);
 });
 
-it('should build delete string with whereIn condition.', function() use($connection) {
+it('should build delete string with whereIn condition.', function () use ($connection) {
     $expected = "DELETE FROM `my_table` WHERE `field` IN (1, 2, 3)";
 
     $query = $connection
@@ -121,7 +121,7 @@ it('should build delete string with whereIn condition.', function() use($connect
     Assert::assertEquals($expected, $query);
 });
 
-it('should build delete string with whereNotIn condition.', function() use($connection) {
+it('should build delete string with whereNotIn condition.', function () use ($connection) {
     $expected = "DELETE FROM `my_table` WHERE `field` NOT IN (1, 2, 3)";
 
     $query = $connection
@@ -132,7 +132,7 @@ it('should build delete string with whereNotIn condition.', function() use($conn
     Assert::assertEquals($expected, $query);
 });
 
-it('should build delete string with function.', function() use($connection) {
+it('should build delete string with function.', function () use ($connection) {
     $expected = "DELETE FROM `my_table` WHERE CHAR_LENGTH(`field`) > 2 AND CHAR_LENGTH(`field`) < 20";
 
     $query = $connection

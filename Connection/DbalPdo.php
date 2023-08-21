@@ -141,7 +141,7 @@ class DbalPdo extends Connection
 
         $generator = new DsnGenerator();
 
-        $this->dsn = match($this->pdoDriver) {
+        $this->dsn = match ($this->pdoDriver) {
             'sqlsrv' => $generator->getSqlsrvDNS($this),
             'dblib' => $generator->getDblibDNS($this),
             'sqlite' => $generator->getSqliteDNS($this),
@@ -201,7 +201,7 @@ class DbalPdo extends Connection
         if ($this->getName(driver: $params['driver']) === 'mysql') {
             if (defined(constant_name: 'PDO::MYSQL_ATTR_INIT_COMMAND')) {
                 $options[PDO::MYSQL_ATTR_INIT_COMMAND] =
-                    'SET NAMES ' . $params['charset'] . ' COLLATE ' . $params['collation'];
+                'SET NAMES ' . $params['charset'] . ' COLLATE ' . $params['collation'];
             }
 
             $command[] = 'SET SQL_MODE=ANSI_QUOTES';
@@ -303,7 +303,7 @@ class DbalPdo extends Connection
     public function schemaCompiler(): Schema\Compiler
     {
         if (is_null__($this->schemaCompiler)) {
-            $this->schemaCompiler = match($this->getDriver()) {
+            $this->schemaCompiler = match ($this->getDriver()) {
                 'mysql' => new Schema\Compiler\MySQL(connection: $this),
                 'pgsql' => new Schema\Compiler\PostgreSQL(connection: $this),
                 'dblib', 'mssql', 'sqlsrv', 'sybase' => new Schema\Compiler\SQLServer(connection: $this),
@@ -321,7 +321,7 @@ class DbalPdo extends Connection
     /**
      * Close the current connection by destroying the associated PDO object
      */
-    public function disconnect()
+    public function disconnect(): void
     {
         $this->pdoInstance = null;
     }
@@ -641,7 +641,7 @@ class DbalPdo extends Connection
      *
      * @param string $charset Encoding.
      */
-    protected function setCharset(string $charset)
+    protected function setCharset(string $charset): void
     {
         if (! empty($charset)) {
             $this->pdoInstance->exec(statement: "SET NAMES {$this->quote(value: $charset)}");

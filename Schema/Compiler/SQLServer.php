@@ -47,7 +47,7 @@ class SQLServer extends Compiler
 
     protected function handleTypeInteger(BaseColumn $column): string
     {
-        return match($column->get(name: 'size', default: 'normal')) {
+        return match ($column->get(name: 'size', default: 'normal')) {
             'tiny' => 'TINYINT',
             'small' => 'SMALLINT',
             'medium' => 'INTEGER',
