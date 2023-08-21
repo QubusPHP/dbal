@@ -68,7 +68,7 @@ class Select extends Where
      * @param mixed $table Table to select from.
      * @param ...
      */
-    public function from($table): static
+    public function from(mixed $table): static
     {
         $tables = func_get_args();
 

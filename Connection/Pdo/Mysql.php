@@ -16,7 +16,6 @@ namespace Qubus\Dbal\Connection\Pdo;
 
 use Qubus\Dbal\Connection\DbalPdo;
 use Qubus\Dbal\DB;
-
 use Qubus\Exception\Exception;
 
 use function array_map;

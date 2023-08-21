@@ -192,9 +192,7 @@ abstract class Connection
 
             // all fine, commit the transaction
             $this->commitTransaction();
-        }
-        // catch any errors generated in the callback
-        catch (PDOException $e) {
+        } catch (PDOException $e) { // catch any errors generated in the callback
             // rollback on error
             $this->rollbackTransaction();
             throw new DbalException(message: $e->getMessage(), code: (int) $e->getCode());

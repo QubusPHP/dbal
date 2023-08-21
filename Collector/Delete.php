@@ -20,7 +20,7 @@ class Delete extends Where
 {
     protected ?string $type = DB::DELETE;
 
-    public function __construct($table = null)
+    public function __construct(string|array $table = null)
     {
         $table && $this->table = $table;
     }
@@ -28,10 +28,10 @@ class Delete extends Where
     /**
      * Sets the table to update
      *
-     * @param   string  $table  table to update
+     * @param string|array $table table to update
      * @return  object  $this
      */
-    public function from($table)
+    public function from(string|array $table): object
     {
         $this->table = $table;
 

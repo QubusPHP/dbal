@@ -17,9 +17,6 @@ namespace Qubus\Dbal\Connection\Pdo;
 use PDO;
 use Qubus\Dbal\Connection\DbalPdo;
 
-use function constant;
-use function strtoupper;
-
 class Sqlsrv extends DbalPdo
 {
     /**
@@ -27,7 +24,7 @@ class Sqlsrv extends DbalPdo
      *
      * @param string $charset  encoding
      */
-    protected function setCharset(string $charset)
+    protected function setCharset(string $charset): void
     {
         if ($charset === 'utf8' || $charset = 'utf-8') {
             // use utf8 encoding

@@ -64,7 +64,7 @@ class Fnc
     /**
      * Returns default the quoting type.
      *
-     * @return  string  quoteation type
+     * @return  string  quotation type
      */
     public function quoteAs(): string
     {

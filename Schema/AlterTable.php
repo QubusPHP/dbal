@@ -226,6 +226,7 @@ class AlterTable
     }
 
     /**
+     * @param string $column
      * @param mixed $value
      * @return $this
      */
