@@ -3,7 +3,7 @@
 A database abstraction layer toolkit with query builder and schema builder. Works with MySql and should work with any other PDO driver but needs testing.
 
 ## Requirements
-* PHP 8.1+
+* PHP 8.2+
 
 ## Installation
 ```

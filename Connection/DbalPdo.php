@@ -4,10 +4,9 @@
  * Qubus\Dbal
  *
  * @link       https://github.com/QubusPHP/dbal
- * @copyright  2020 Joshua Parker
+ * @copyright  2020
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.0.0
  */
 
 declare(strict_types=1);
@@ -186,9 +185,9 @@ class DbalPdo extends Connection
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    private function resolveOptions(): mixed
+    private function resolveOptions(): array
     {
         $options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -497,7 +496,7 @@ class DbalPdo extends Connection
      * @param PDOStatement $statement
      * @param array $values
      */
-    protected function bindValues(PDOStatement $statement, array $values)
+    protected function bindValues(PDOStatement $statement, array $values): void
     {
         foreach ($values as $key => $value) {
             $param = PDO::PARAM_STR;
