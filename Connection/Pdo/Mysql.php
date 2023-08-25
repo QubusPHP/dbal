@@ -4,10 +4,9 @@
  * Qubus\Dbal
  *
  * @link       https://github.com/QubusPHP/dbal
- * @copyright  2020 Joshua Parker
+ * @copyright  2020
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.0.0
  */
 
 declare(strict_types=1);
@@ -68,7 +67,10 @@ class Mysql extends DbalPdo
      */
     public function listFields($table): array
     {
-        $query = DB::query(query: 'SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier(value: $table), type: DB::SELECT)->asAssoc();
+        $query = DB::query(
+            query: 'SHOW FULL COLUMNS FROM ' . $this->quoteIdentifier(value: $table),
+            type: DB::SELECT
+        )->asAssoc();
 
         $result = $query->execute(connection: $this);
 

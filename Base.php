@@ -4,10 +4,9 @@
  * Qubus\Dbal
  *
  * @link       https://github.com/QubusPHP/dbal
- * @copyright  2020 Joshua Parker
+ * @copyright  2020
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.0.0
  */
 
 declare(strict_types=1);
@@ -110,12 +109,16 @@ abstract class Base
     /**
      * Set the return type for SELECT statements
      *
-     * @param bool|string|null $object Null for connection default, false for array, true for stdClass or string classname.
+     * @param bool|string|null $object Null for connection default, false for array,
+     *                                 true for stdClass or string classname.
      * @param bool $propertiesLate Accessing properties late.
      * @param array $constructorArguments Constructor arguments.
      */
-    public function asObject(bool|string|null $object = true, bool $propertiesLate = false, array $constructorArguments = []): static
-    {
+    public function asObject(
+        bool|string|null $object = true,
+        bool $propertiesLate = false,
+        array $constructorArguments = []
+    ): static {
         $this->asObject = $object;
         $this->propertiesLate = $propertiesLate;
         $this->constructorArguments = $constructorArguments;
