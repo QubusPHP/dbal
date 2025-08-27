@@ -577,7 +577,7 @@ class DbalPdo extends Connection
      * @param float|array|bool|int|string|Base|Expression|Fnc|null $value any value to quote
      * @return int|string
      */
-    public function quote(Expression|float|Base|array|bool|int|string|Fnc $value = null): int|string
+    public function quote(Expression|float|Base|array|bool|int|string|Fnc|null $value = null): int|string
     {
         try {
             if (! $this->pdoInstance instanceof PDO) {

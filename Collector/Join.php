@@ -47,7 +47,7 @@ class Join
      * @param string|null $op      logic operator
      * @param array|string|null $value   value or array for alias
      */
-    public function on(array|string $column, string $op = null, array|string $value = null): void
+    public function on(array|string $column, ?string $op = null, array|string|null $value = null): void
     {
         if (func_num_args() === 2) {
             $value = $op;
@@ -64,7 +64,7 @@ class Join
      * @param string|null $op      logic operator
      * @param array|string|null $value   value or array for alias
      */
-    public function andOn(array|string $column, string $op = null, array|string $value = null): void
+    public function andOn(array|string $column, ?string $op = null, array|string|null $value = null): void
     {
         call_user_func_array([$this, 'on'], func_get_args());
     }
@@ -76,7 +76,7 @@ class Join
      * @param string|null $op      logic operator
      * @param array|string|null $value   value or array for alias
      */
-    public function orOn(array|string $column, string $op = null, array|string $value = null): void
+    public function orOn(array|string $column, ?string $op = null, array|string|null $value = null): void
     {
         if (func_num_args() === 2) {
             $value = $op;
