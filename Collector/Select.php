@@ -197,7 +197,7 @@ class Select extends Where
      * @param string|null $column2 column name
      * @throws Exception
      */
-    public function orOn(string $column1, string $op, string $column2 = null): static
+    public function orOn(string $column1, string $op, ?string $column2 = null): static
     {
         if (! $this->lastJoin) {
             throw new Exception(message: 'You must first join a table before setting an "OR ON" clause.');
@@ -312,7 +312,7 @@ class Select extends Where
      * @param string|null $op Having logic operator.
      * @param mixed|null $value Having value.
      */
-    public function orNotHaving(mixed $column, string $op = null, mixed $value = null): static
+    public function orNotHaving(mixed $column, ?string $op = null, mixed $value = null): static
     {
         if ($column instanceof Closure) {
             $this->orNotHavingOpen();

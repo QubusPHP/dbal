@@ -23,7 +23,7 @@ abstract class Base
     protected bool|string|null $asObject = null;
 
     /** @var bool $propertiesLate  true for assigning properties after object creation */
-    protected bool $propertiesLate;
+    protected bool $propertiesLate = true;
 
     /** @var array  $constructorArguments constructor arguments */
     protected array $constructorArguments = [];
@@ -195,7 +195,7 @@ abstract class Base
      * @return int|bool|array Query result.
      * @throws Exception
      */
-    public function execute(Connection $connection = null): int|bool|array
+    public function execute(?Connection $connection = null): int|bool|array
     {
         $connection || $connection = $this->getConnection();
 
@@ -213,7 +213,7 @@ abstract class Base
      * @return string compiled query.
      * @throws Exception
      */
-    public function compile(Connection $connection = null): string
+    public function compile(?Connection $connection = null): string
     {
         $connection || $connection = $this->getConnection();
 

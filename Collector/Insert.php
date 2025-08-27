@@ -49,7 +49,7 @@ class Insert extends Collector
      * @param string|null $field
      * @return Insert|string|null current instance when setting, string fieldname when getting.
      */
-    public function insertIdField(string $field = null): static|string|null
+    public function insertIdField(?string $field = null): static|string|null
     {
         if ($field) {
             $this->insertIdField = $field;

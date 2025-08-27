@@ -45,7 +45,7 @@ class Where extends Collector
      * @param mixed|null $value Where value.
      * @return mixed Current instance.
      */
-    public function where(mixed $column, string $op = null, mixed $value = null): mixed
+    public function where(mixed $column, ?string $op = null, mixed $value = null): mixed
     {
         return call_user_func_array([$this, 'andWhere'], func_get_args());
     }
@@ -58,7 +58,7 @@ class Where extends Collector
      * @param mixed|null $value Where value.
      * @return static Current instance.
      */
-    public function andWhere(mixed $column, string $op = null, mixed $value = null): static
+    public function andWhere(mixed $column, ?string $op = null, mixed $value = null): static
     {
         if ($column instanceof Closure) {
             $this->andWhereOpen();
@@ -83,7 +83,7 @@ class Where extends Collector
      * @param string|null $op      where logic operator
      * @param mixed|null $value   where value
      */
-    public function orWhere(mixed $column, string $op = null, mixed $value = null): static
+    public function orWhere(mixed $column, ?string $op = null, mixed $value = null): static
     {
         if ($column instanceof Closure) {
             $this->orWhereOpen();
@@ -108,7 +108,7 @@ class Where extends Collector
      * @param string|null $op      where logic operator
      * @param mixed|null $value   where value
      */
-    public function notWhere(mixed $column, string $op = null, mixed $value = null)
+    public function notWhere(mixed $column, ?string $op = null, mixed $value = null)
     {
         return call_user_func_array([$this, 'andNotWhere'], func_get_args());
     }
@@ -120,7 +120,7 @@ class Where extends Collector
      * @param string|null $op      where logic operator
      * @param mixed|null $value   where value
      */
-    public function andNotWhere(mixed $column, string $op = null, mixed $value = null): static
+    public function andNotWhere(mixed $column, ?string $op = null, mixed $value = null): static
     {
         if ($column instanceof Closure) {
             $this->andNotWhereOpen();
@@ -145,7 +145,7 @@ class Where extends Collector
      * @param string|null $op      where logic operator
      * @param mixed|null $value   where value
      */
-    public function orNotWhere(mixed $column, string $op = null, mixed $value = null): static
+    public function orNotWhere(mixed $column, ?string $op = null, mixed $value = null): static
     {
         if ($column instanceof Closure) {
             $this->orNotWhereOpen();
