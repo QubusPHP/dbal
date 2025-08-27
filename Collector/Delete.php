@@ -19,7 +19,7 @@ class Delete extends Where
 {
     protected ?string $type = DB::DELETE;
 
-    public function __construct(string|array $table = null)
+    public function __construct(string|array|null $table = null)
     {
         $table && $this->table = $table;
     }
