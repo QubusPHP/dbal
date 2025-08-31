@@ -154,9 +154,9 @@ class DbalPdo extends Connection
     }
 
     /**
-     * @return PDO|null
+     * @return PDO|string|null
      */
-    private function loadDatabase(): ?PDO
+    private function loadDatabase(): PDO|string|null
     {
         if (! $this->pdoInstance) {
             try {
@@ -178,7 +178,7 @@ class DbalPdo extends Connection
                     }
                 }
             } catch (PDOException $e) {
-                trigger_error(message: $e->getMessage(), error_level: E_USER_ERROR);
+                return $e->getMessage();
             }
         }
         return $this->pdoInstance;
@@ -252,7 +252,7 @@ class DbalPdo extends Connection
             case strpos(haystack: $driver, needle: 'mssql'):
             case strpos(haystack: $driver, needle: 'sqlserver'):
             case strpos(haystack: $driver, needle: 'sqlsrv'):
-                $driver = strpos(haystack: PHP_OS, needle: 'WIN') !== false ? 'sqlsrv' : 'dblib';
+                $driver = str_contains(PHP_OS, 'WIN') ? 'sqlsrv' : 'dblib';
                 break;
             case strpos(haystack: $driver, needle: 'sybase'):
                 $driver = 'dblib';
@@ -547,14 +547,14 @@ class DbalPdo extends Connection
             return $this->quoteIdentifier(value: $_value) . ' AS ' . $this->quoteIdentifier(value: $alias);
         }
 
-        if (strpos(haystack: $value, needle: '"') !== false) {
+        if (str_contains($value, '"')) {
             // Quote the column in FUNC("ident") identifiers
             return preg_replace_callback(pattern: '/"(.+?)"/', callback: function ($matches) {
                 return $this->quoteIdentifier($matches[1]);
             }, subject: $value);
         }
 
-        if (strpos(haystack: $value, needle: '.') !== false) {
+        if (str_contains($value, '.')) {
             // Split the identifier into the individual parts
             $parts = explode(separator: '.', string: $value);
 

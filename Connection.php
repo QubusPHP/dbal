@@ -32,7 +32,7 @@ use function ucfirst;
 
 abstract class Connection
 {
-    public const DEFAULT_PARAMETERS = [
+    public const array DEFAULT_PARAMETERS = [
         'type'           => 'pdo',
         'driver'         => 'mysql',
         'profiling'      => false,

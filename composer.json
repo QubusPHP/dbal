@@ -11,20 +11,16 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "ext-pdo": "*",
         "psr/cache": "^3.0",
         "qubus/exception": "^3.0",
-        "qubus/support": "^3.0",
+        "qubus/support": "^4",
         "qubus/valueobjects": "^3.0"
     },
     "require-dev": {
-        "mockery/mockery": "^1.3.1",
-        "pestphp/pest": "^1.22",
-        "pestphp/pest-plugin-mock": "^1.0",
-        "phpunit/phpunit": "^9.0",
-        "qubus/qubus-coding-standard": "^1.1",
-        "squizlabs/php_codesniffer": "^3.5"
+        "mockery/mockery": "^1",
+        "qubus/qubus-coding-standard": "^2"
     },
     "autoload": {
         "psr-4": {

@@ -74,7 +74,7 @@ abstract class Compiler
         $oldQuery = $this->query;
         $this->query = $contents;
 
-        // Compile the query according to it's type.
+        // Compile the query according to its type.
         $result = $this->{'compile' . $type}();
         is_string($result) && $result = trim($result);
 
@@ -102,7 +102,7 @@ abstract class Compiler
             }
         } elseif (is_string(value: $contents)) {
             foreach ($bindings as $from => $to) {
-                substr(string: $from, offset: 0, length: 1) !== ':' && $from = ':' . $from;
+                !str_starts_with($from, ':') && $from = ':' . $from;
                 $contents = preg_replace(pattern: '/' . $from . '/', replacement: $to, subject: $contents);
             }
         }

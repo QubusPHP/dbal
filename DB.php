@@ -17,6 +17,7 @@ use Qubus\Dbal\Collector\Delete;
 use Qubus\Dbal\Collector\Insert;
 use Qubus\Dbal\Collector\Select;
 use Qubus\Dbal\Collector\Update;
+use Qubus\Exception\Data\TypeException;
 use Qubus\Exception\Exception;
 use Qubus\ValueObjects\DateTime\DateTime;
 use Qubus\ValueObjects\DateTime\Exception\InvalidDateException;
@@ -35,11 +36,11 @@ class DB
     /**
      * Query type constants.
      */
-    public const PLAIN                 = 'Plain';
-    public const INSERT                = 'Insert';
-    public const SELECT                = 'Select';
-    public const UPDATE                = 'Update';
-    public const DELETE                = 'Delete';
+    public const string PLAIN                 = 'Plain';
+    public const string INSERT                = 'Insert';
+    public const string SELECT                = 'Select';
+    public const string UPDATE                = 'Update';
+    public const string DELETE                = 'Delete';
 
     protected static Connection $connection;
 
@@ -175,6 +176,7 @@ class DB
      *
      * @return DateTime Immutable datetime object.
      * @throws InvalidDateException
+     * @throws TypeException
      */
     public static function now(): DateTime
     {
