@@ -5,5 +5,4 @@
 .phpcs-cache
 .phpunit.result.cache
 composer.lock
-phpunit.xml
 index.php
